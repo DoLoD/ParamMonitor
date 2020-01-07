@@ -1,0 +1,643 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:ParamerusStudio"
+                    xmlns:dxa="http://schemas.devexpress.com/winfx/2008/xaml/accordion"
+                    xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+                    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+                    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+                    xmlns:dxwui="http://schemas.devexpress.com/winfx/2008/xaml/windowsui"
+                    xmlns:components="clr-namespace:ParamerusStudio.Components">
+
+    <SolidColorBrush x:Key="Paramerus.MainColor" Color="#FFC20000"/>
+    <SolidColorBrush x:Key="Paramerus.HeaderSplitter" Color="#FFAEAEAE"/>
+    <SolidColorBrush x:Key="Paramerus.HeaderButtonBorder" Color="#FF6B7288"/>
+    <SolidColorBrush x:Key="Paramerus.HeaderBackground" Color="#FFFEFEFE"/>
+    <SolidColorBrush x:Key="Paramerus.HoverBackground" Color="#FFEEBCBC"/>
+
+    <SolidColorBrush x:Key="Paramerus.RegisterBitFaultColor" Color="#FFFE0000"/>
+    <SolidColorBrush x:Key="Paramerus.RegisterBitWarningColor" Color="#FFFEA400"/>
+    
+
+    <SolidColorBrush x:Key="Button.Static.Background" Color="#FFDDDDDD"/>
+    <SolidColorBrush x:Key="Button.Static.Border" Color="#FF707070"/>
+    <SolidColorBrush x:Key="Button.MouseOver.Background" Color="#FFBEE6FD"/>
+    <SolidColorBrush x:Key="Button.MouseOver.Border" Color="#FF3C7FB1"/>
+    <SolidColorBrush x:Key="Button.Pressed.Background" Color="#FFC4E5F6"/>
+    <SolidColorBrush x:Key="Button.Pressed.Border" Color="#FF2C628B"/>
+    <SolidColorBrush x:Key="Button.Disabled.Background" Color="#FFF4F4F4"/>
+    <SolidColorBrush x:Key="Button.Disabled.Border" Color="#FFADB2B5"/>
+    <SolidColorBrush x:Key="Button.Disabled.Foreground" Color="#FF838383"/>
+    
+    <CornerRadius x:Key="Paramerus.CornerRadius" TopLeft="7" TopRight="7" BottomLeft="7" BottomRight="7"/>
+
+    <local:VisibilityToCheckedConverter x:Key="VisibilityToCheckedConverter"/>
+
+    <Style x:Key="ToggleButtonMenuStyle" BasedOn="{StaticResource {x:Type ToggleButton}}" TargetType="RadioButton">
+        <Setter Property="Width" Value="100"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
+                        <ContentPresenter x:Name="contentPresenter" 
+                                          Focusable="False" 
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                          Margin="{TemplateBinding Padding}" 
+                                          RecognizesAccessKey="True" 
+                                          SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                            <ContentPresenter.Content>
+                                <Grid>
+                                    <TextBlock Text="{TemplateBinding Content}"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               />
+                                </Grid>
+                                
+                            </ContentPresenter.Content>
+                        </ContentPresenter>
+
+                        
+
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter Property="Background" Value="{StaticResource Paramerus.HoverBackground}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="true">
+                            <Setter Property="IsChecked" Value="true"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="true">
+                            <Setter Property="Background" Value="{StaticResource Paramerus.MainColor}"/>
+                            <Setter Property="Foreground" Value="White"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="RegisterGridCellBackgroundStyle" TargetType="DataGridCell">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Path=CurrentStatusBit}" Value="Fault">
+                <Setter Property="Background" Value="{StaticResource Paramerus.RegisterBitFaultColor}"/>
+                <Setter Property="Foreground" Value="White"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Path=CurrentStatusBit}" Value="Warning">
+                <Setter Property="Background" Value="{StaticResource Paramerus.RegisterBitWarningColor}"/>
+                <Setter Property="Foreground" Value="Black"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="RegisterGridRowBackgroundStyle" TargetType="DataGridRow">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Path=CurrentStatusBit}" Value="Fault">
+                <Setter Property="Background" Value="{StaticResource Paramerus.RegisterBitFaultColor}"/>
+                <Setter Property="Foreground" Value="White"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Path=CurrentStatusBit}" Value="Warning">
+                <Setter Property="Background" Value="{StaticResource Paramerus.RegisterBitWarningColor}"/>
+                <Setter Property="Foreground" Value="Black"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <components:StatusRegisterToBackgroundConverter x:Key="SRToTitleBackgroundConverter"/>
+
+    <Style x:Key="ParamerusRegisterStatusGroupBoxStylle" TargetType="dxlc:GroupBox">
+        <Setter Property="Width" Value="Auto"/>
+        <Setter Property="Height" Value="Auto"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="MinimizeElementVisibility" Value="Visible"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="State" Value="Minimized"/>
+    </Style>
+    
+    <Style x:Key="ParamerusRegisterStatusDataGridStyle" TargetType="DataGrid">
+        <Setter Property="HeadersVisibility" Value="None"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="AutoGenerateColumns" Value="False"/>
+        <Setter Property="CanUserAddRows" Value="False"/>
+        <Setter Property="CanUserReorderColumns" Value="False"/>
+        <Setter Property="CanUserSortColumns" Value="False"/>
+        <Setter Property="CanUserResizeRows" Value="False"/>
+        <Setter Property="CanUserDeleteRows" Value="False"/>
+        <Setter Property="IsReadOnly" Value="True"/>
+        <Setter Property="SelectionMode" Value="Single"/>
+        <Setter Property="BorderBrush" Value="{StaticResource Paramerus.HeaderSplitter}"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="RowStyle" Value="{StaticResource RegisterGridRowBackgroundStyle}"/>
+    </Style>
+
+    
+    <components:ParamerusRegisterStatus x:Key="Register_STATUS_VOUT" x:Name="Register_STATUS_VOUT">
+        <components:ParamerusRegisterStatus.RegisterBits>
+            <components:ParamerusRegisterBit NameBit="Vout OV Fault"
+                                             CurrentStatusBit="Fault"
+                                             BitNum="7"/>
+            <components:ParamerusRegisterBit NameBit="Vout OV Warning"
+                                             CurrentStatusBit="Warning"
+                                             BitNum="6"/>
+            <components:ParamerusRegisterBit NameBit="Vout UV Warning"
+                                             CurrentStatusBit="BitNotImplemented"
+                                             BitNum="5"/>
+            <components:ParamerusRegisterBit NameBit="Vout UV Fault"
+                                             BitNum="4"/>
+            <components:ParamerusRegisterBit NameBit="VOUT_MAX Warning"
+                                             BitNum="3"/>
+            <components:ParamerusRegisterBit NameBit="TON_MAX Fault"
+                                             BitNum="2"/>
+            <components:ParamerusRegisterBit NameBit="TOFF_MAX Warning"
+                                             BitNum="1"/>
+            <components:ParamerusRegisterBit NameBit="Vout Tracking Error"
+                                             BitNum="0"/>
+        </components:ParamerusRegisterStatus.RegisterBits>
+    </components:ParamerusRegisterStatus>
+    <components:ParamerusRegisterStatus x:Key="Register_STATUS_IOUT">
+        <components:ParamerusRegisterStatus.RegisterBits>
+            <components:ParamerusRegisterBit NameBit="IOUT OV Fault"
+                                             CurrentStatusBit="Warning"
+                                             BitNum="7"/>
+            <components:ParamerusRegisterBit NameBit="IOUT OC Fault with LV Shutdown"
+                                             BitNum="6"/>
+            <components:ParamerusRegisterBit NameBit="IOUT OC Fault"
+                                             BitNum="5"/>
+            <components:ParamerusRegisterBit NameBit="IOUT UC Fault"
+                                             BitNum="4"/>
+            <components:ParamerusRegisterBit NameBit="Current Share Fault"
+                                             BitNum="3"/>
+            <components:ParamerusRegisterBit NameBit="Power Limiting Mode"
+                                             BitNum="2"/>
+            <components:ParamerusRegisterBit NameBit="POUT OP Fault"
+                                             BitNum="1"/>
+            <components:ParamerusRegisterBit NameBit="POUT OP Warning"
+                                             BitNum="0"/>
+        </components:ParamerusRegisterStatus.RegisterBits>
+    </components:ParamerusRegisterStatus>
+    <components:ParamerusRegisterStatus x:Key="Register_STATUS_TEMP">
+        <components:ParamerusRegisterStatus.RegisterBits>
+            <components:ParamerusRegisterBit NameBit="OT Fault"
+                                             BitNum="7"/>
+            <components:ParamerusRegisterBit NameBit="OT Warning"
+                                             BitNum="6"/>
+            <components:ParamerusRegisterBit NameBit="UT Fault"
+                                             BitNum="5"/>
+            <components:ParamerusRegisterBit NameBit="UT Warning"
+                                             BitNum="4"/>
+            <components:ParamerusRegisterBit NameBit="Reserved"
+                                             BitNum="3"/>
+            <components:ParamerusRegisterBit NameBit="Reserved"
+                                             BitNum="2"/>
+            <components:ParamerusRegisterBit NameBit="Reserved"
+                                             BitNum="1"/>
+            <components:ParamerusRegisterBit NameBit="Reserved"
+                                             BitNum="0"/>
+        </components:ParamerusRegisterStatus.RegisterBits>
+    </components:ParamerusRegisterStatus>
+    <components:ParamerusRegisterStatus x:Key="Register_STATUS_CML">
+        <components:ParamerusRegisterStatus.RegisterBits>
+            <components:ParamerusRegisterBit NameBit="Invalid Command"
+                                             BitNum="7"/>
+            <components:ParamerusRegisterBit NameBit="Invalid Data"
+                                             BitNum="6"/>
+            <components:ParamerusRegisterBit NameBit="PEC Fault"
+                                             BitNum="5"/>
+            <components:ParamerusRegisterBit NameBit="Memory Fault"
+                                             BitNum="4"/>
+            <components:ParamerusRegisterBit NameBit="Processor Fault"
+                                             BitNum="3"/>
+            <components:ParamerusRegisterBit NameBit="Reserved"
+                                             BitNum="2"/>
+            <components:ParamerusRegisterBit NameBit="Other Comms Fault"
+                                             BitNum="1"/>
+            <components:ParamerusRegisterBit NameBit="Other Memory/Logic Fault"
+                                             BitNum="0"/>
+        </components:ParamerusRegisterStatus.RegisterBits>
+    </components:ParamerusRegisterStatus>
+    <components:ParamerusRegisterStatus x:Key="Register_STATUS_INPUT">
+        <components:ParamerusRegisterStatus.RegisterBits>
+            <components:ParamerusRegisterBit NameBit="Vin OV Fault"
+                                             BitNum="7"/>
+            <components:ParamerusRegisterBit NameBit="Vin OV Warning"
+                                             BitNum="6"/>
+            <components:ParamerusRegisterBit NameBit="Vin UV Warning"
+                                             BitNum="5"/>
+            <components:ParamerusRegisterBit NameBit="Vin UV Fault"
+                                             BitNum="4"/>
+            <components:ParamerusRegisterBit NameBit="Unit off: Insufficient Vin"
+                                             BitNum="3"/>
+            <components:ParamerusRegisterBit NameBit="IIN OC Fault"
+                                             BitNum="2"/>
+            <components:ParamerusRegisterBit NameBit="IIN OC Warning"
+                                             BitNum="1"/>
+            <components:ParamerusRegisterBit NameBit="PIN OP Warning"
+                                             BitNum="0"/>
+        </components:ParamerusRegisterStatus.RegisterBits>
+    </components:ParamerusRegisterStatus>
+    <components:ParamerusRegisterStatus x:Key="Register_STATUS_Fans_1_2">
+        <components:ParamerusRegisterStatus.RegisterBits>
+            <components:ParamerusRegisterBit NameBit="Fan 1 Fault"
+                                             BitNum="7"/>
+            <components:ParamerusRegisterBit NameBit="Fan 2 Fault"
+                                             BitNum="6"/>
+            <components:ParamerusRegisterBit NameBit="Fan 1 Warning"
+                                             BitNum="5"/>
+            <components:ParamerusRegisterBit NameBit="Fan 2 Warning"
+                                             BitNum="4"/>
+            <components:ParamerusRegisterBit NameBit="Fan 1 Speed Overridden"
+                                             BitNum="3"/>
+            <components:ParamerusRegisterBit NameBit="Fan 2 Speed Overridden"
+                                             BitNum="2"/>
+            <components:ParamerusRegisterBit NameBit="Air Flow Fault"
+                                             BitNum="1"/>
+            <components:ParamerusRegisterBit NameBit="Air Flow Warning"
+                                             BitNum="0"/>
+        </components:ParamerusRegisterStatus.RegisterBits>
+    </components:ParamerusRegisterStatus>
+    <components:ParamerusRegisterStatus x:Key="Register_STATUS_Fans_3_4">
+        <components:ParamerusRegisterStatus.RegisterBits>
+            <components:ParamerusRegisterBit NameBit="Fan 3 Fault"
+                                             BitNum="7"/>
+            <components:ParamerusRegisterBit NameBit="Fan 4 Fault"
+                                             BitNum="6"/>
+            <components:ParamerusRegisterBit NameBit="Fan 3 Warning"
+                                             BitNum="5"/>
+            <components:ParamerusRegisterBit NameBit="Fan 4 Warning"
+                                             BitNum="4"/>
+            <components:ParamerusRegisterBit NameBit="Fan 3 Speed Overridden"
+                                             BitNum="3"/>
+            <components:ParamerusRegisterBit NameBit="Fan 4 Speed Overridden"
+                                             BitNum="2"/>
+            <components:ParamerusRegisterBit NameBit="Reserved"
+                                             BitNum="1"/>
+            <components:ParamerusRegisterBit NameBit="Reserved"
+                                             BitNum="0"/>
+        </components:ParamerusRegisterStatus.RegisterBits>
+    </components:ParamerusRegisterStatus>
+    <components:ParamerusRegisterStatus x:Key="Register_STATUS_MFR_SPECIFIC">
+        <components:ParamerusRegisterStatus.RegisterBits>
+            <components:ParamerusRegisterBit NameBit="Manufacturer 7"
+                                             BitNum="7"/>
+            <components:ParamerusRegisterBit NameBit="Manufacturer 6"
+                                             BitNum="6"/>
+            <components:ParamerusRegisterBit NameBit="Manufacturer 5"
+                                             BitNum="5"/>
+            <components:ParamerusRegisterBit NameBit="Manufacturer 4"
+                                             BitNum="4"/>
+            <components:ParamerusRegisterBit NameBit="Manufacturer 3"
+                                             BitNum="3"/>
+            <components:ParamerusRegisterBit NameBit="Manufacturer 2"
+                                             BitNum="2"/>
+            <components:ParamerusRegisterBit NameBit="Manufacturer 1"
+                                             BitNum="1"/>
+            <components:ParamerusRegisterBit NameBit="Manufacturer 0"
+                                             BitNum="0"/>
+        </components:ParamerusRegisterStatus.RegisterBits>
+    </components:ParamerusRegisterStatus>
+    <components:ParamerusRegisterStatus x:Key="Register_STATUS_OTHER">
+        <components:ParamerusRegisterStatus.RegisterBits>
+            <components:ParamerusRegisterBit NameBit="Reserved"
+                                             BitNum="7"/>
+            <components:ParamerusRegisterBit NameBit="Reserved"
+                                             BitNum="6"/>
+            <components:ParamerusRegisterBit NameBit="Input A fuse rr circuit breaker fault"
+                                             BitNum="5"/>
+            <components:ParamerusRegisterBit NameBit="Input B fuse Or circuit breaker fault"
+                                             BitNum="4"/>
+            <components:ParamerusRegisterBit NameBit="Input A OR-ing device fault"
+                                             BitNum="3"/>
+            <components:ParamerusRegisterBit NameBit="Input B OR-ing device fault"
+                                             BitNum="2"/>
+            <components:ParamerusRegisterBit NameBit="Output OR-ing device fault"
+                                             BitNum="1"/>
+            <components:ParamerusRegisterBit NameBit="Reserved"
+                                             BitNum="0"/>
+        </components:ParamerusRegisterStatus.RegisterBits>
+    </components:ParamerusRegisterStatus>
+    
+    <ControlTemplate x:Key="ParamerusLowItemStyle" TargetType="{x:Type MenuItem}">
+        <Border x:Name="templateRoot" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+            <Grid Margin="-1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition MinWidth="22" SharedSizeGroup="MenuItemIconColumnGroup" Width="Auto"/>
+                    <ColumnDefinition Width="13"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="30"/>
+                    <ColumnDefinition SharedSizeGroup="MenuItemIGTColumnGroup" Width="Auto"/>
+                    <ColumnDefinition Width="20"/>
+                </Grid.ColumnDefinitions>
+                <ContentPresenter x:Name="Icon" Content="{TemplateBinding Icon}" ContentSource="Icon" HorizontalAlignment="Center" Height="16" Margin="3" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="Center" Width="16"/>
+                <Border x:Name="GlyphPanel" BorderBrush="#FF26A0DA" BorderThickness="1" Background="#3D26A0DA" Height="22" Margin="-1,0,0,0" Visibility="Hidden" VerticalAlignment="Center" Width="22">
+                    <Path x:Name="Glyph" Data="F1M10,1.2L4.7,9.1 4.5,9.1 0,5.2 1.3,3.5 4.3,6.1 8.3,0 10,1.2z" Fill="#FF212121" FlowDirection="LeftToRight" Height="11" Width="9"/>
+                </Border>
+                <ContentPresenter ContentTemplate="{TemplateBinding HeaderTemplate}" Content="{TemplateBinding Header}" Grid.Column="2" ContentStringFormat="{TemplateBinding HeaderStringFormat}" ContentSource="Header" HorizontalAlignment="Left" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="4" Margin="{TemplateBinding Padding}" Opacity="0.7" Text="{TemplateBinding InputGestureText}" VerticalAlignment="Center"/>
+                <Path x:Name="RightArrow" Grid.Column="5" Data="M0,0L4,3.5 0,7z" Fill="#FF212121" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center"/>
+                <Popup x:Name="PART_Popup" AllowsTransparency="True" Focusable="False" HorizontalOffset="-2" IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}" PopupAnimation="{DynamicResource {x:Static SystemParameters.MenuPopupAnimationKey}}" Placement="Right" VerticalOffset="-3">
+                    <Border x:Name="SubMenuBorder" BorderBrush="#FF999999" BorderThickness="1" Background="#FFF0F0F0" Padding="2">
+                        <ScrollViewer x:Name="SubMenuScrollViewer" Style="{DynamicResource {ComponentResourceKey ResourceId=MenuScrollViewer, TypeInTargetAssembly={x:Type FrameworkElement}}}">
+                            <Grid RenderOptions.ClearTypeHint="Enabled">
+                                <Canvas HorizontalAlignment="Left" Height="0" VerticalAlignment="Top" Width="0">
+                                    <Rectangle x:Name="OpaqueRect" Fill="{Binding Background, ElementName=SubMenuBorder}" Height="{Binding ActualHeight, ElementName=SubMenuBorder}" Width="{Binding ActualWidth, ElementName=SubMenuBorder}"/>
+                                </Canvas>
+                                <Rectangle Fill="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" HorizontalAlignment="Left" Margin="29,2,0,2" Width="1"/>
+                                <ItemsPresenter x:Name="ItemsPresenter" KeyboardNavigation.DirectionalNavigation="Cycle" Grid.IsSharedSizeScope="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" KeyboardNavigation.TabNavigation="Cycle"/>
+                            </Grid>
+                        </ScrollViewer>
+                    </Border>
+                </Popup>
+            </Grid>
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsSuspendingPopupAnimation" Value="True">
+                <Setter Property="PopupAnimation" TargetName="PART_Popup" Value="None"/>
+            </Trigger>
+            <Trigger Property="Icon" Value="{x:Null}">
+                <Setter Property="Visibility" TargetName="Icon" Value="Collapsed"/>
+            </Trigger>
+            <Trigger Property="IsChecked" Value="True">
+                <Setter Property="Visibility" TargetName="GlyphPanel" Value="Visible"/>
+                <Setter Property="Visibility" TargetName="Icon" Value="Collapsed"/>
+            </Trigger>
+            <Trigger Property="IsHighlighted" Value="True">
+                <Setter Property="Background" TargetName="templateRoot" Value="Transparent"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="TextElement.Foreground" TargetName="templateRoot" Value="#FF707070"/>
+                <Setter Property="Fill" TargetName="Glyph" Value="#FF707070"/>
+                <Setter Property="Fill" TargetName="RightArrow" Value="#FF707070"/>
+            </Trigger>
+            <Trigger Property="CanContentScroll" SourceName="SubMenuScrollViewer" Value="False">
+                <Setter Property="Canvas.Top" TargetName="OpaqueRect" Value="{Binding VerticalOffset, ElementName=SubMenuScrollViewer}"/>
+                <Setter Property="Canvas.Left" TargetName="OpaqueRect" Value="{Binding HorizontalOffset, ElementName=SubMenuScrollViewer}"/>
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <Style x:Key="ParamerusTopItemStyle" TargetType="MenuItem">
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Height" Value="35"/>
+        <Setter Property="Margin" Value="0,1,0,0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type MenuItem}">
+                    <Border x:Name="templateRoot" 
+                            BorderBrush="Transparent" 
+                            BorderThickness="{TemplateBinding BorderThickness}" 
+                            Background="{TemplateBinding Background}" 
+                            SnapsToDevicePixels="True">
+                        <Grid x:Name="Grid" 
+                              VerticalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <ContentPresenter x:Name="Icon" 
+                                              Content="{TemplateBinding Icon}" 
+                                              ContentSource="Icon" 
+                                              HorizontalAlignment="Center" 
+                                              Height="16" 
+                                              Margin="3" 
+                                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
+                                              VerticalAlignment="Center" 
+                                              Width="16"/>
+                            <Path x:Name="GlyphPanel" 
+                                  Data="F1M10,1.2L4.7,9.1 4.5,9.1 0,5.2 1.3,3.5 4.3,6.1 8.3,0 10,1.2z" 
+                                  Fill="{TemplateBinding Foreground}" 
+                                  FlowDirection="LeftToRight" 
+                                  Margin="3" 
+                                  Visibility="Collapsed" 
+                                  VerticalAlignment="Center"/>
+                            <ContentPresenter x:Name="ContentPresenter" 
+                                              ContentTemplate="{TemplateBinding HeaderTemplate}" 
+                                              Content="{TemplateBinding Header}" 
+                                              Grid.Column="1" 
+                                              ContentStringFormat="{TemplateBinding HeaderStringFormat}" 
+                                              ContentSource="Header" 
+                                              Margin="{TemplateBinding Padding}" 
+                                              RecognizesAccessKey="True" 
+                                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                            <Popup x:Name="PART_Popup" 
+                                   AllowsTransparency="True" 
+                                   Focusable="False" 
+                                   IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}" 
+                                   PopupAnimation="{DynamicResource {x:Static SystemParameters.MenuPopupAnimationKey}}" 
+                                   Placement="Bottom">
+                                <Border x:Name="SubMenuBorder" 
+                                        BorderBrush="#FF999999" 
+                                        BorderThickness="1" 
+                                        Background="{StaticResource Paramerus.HeaderBackground}" 
+                                        Padding="2">
+                                    <ScrollViewer x:Name="SubMenuScrollViewer" 
+                                                  Style="{DynamicResource {ComponentResourceKey ResourceId=MenuScrollViewer, TypeInTargetAssembly={x:Type FrameworkElement}}}">
+                                        <Grid x:Name="Grid1" 
+                                              RenderOptions.ClearTypeHint="Enabled">
+                                            <Canvas x:Name="Canvas" 
+                                                    HorizontalAlignment="Left" 
+                                                    Height="0" 
+                                                    VerticalAlignment="Top" 
+                                                    Width="0">
+                                                <Rectangle x:Name="OpaqueRect" 
+                                                           Fill="{Binding Background, ElementName=SubMenuBorder}" 
+                                                           Height="{Binding ActualHeight, ElementName=SubMenuBorder}" 
+                                                           Width="{Binding ActualWidth, ElementName=SubMenuBorder}"/>
+                                            </Canvas>
+                                            <Rectangle x:Name="Rectangle" 
+                                                       Fill="#FFD7D7D7" 
+                                                       HorizontalAlignment="Left" 
+                                                       Margin="29,2,0,2" 
+                                                       Width="1"/>
+                                            <ItemsPresenter x:Name="ItemsPresenter" 
+                                                            KeyboardNavigation.DirectionalNavigation="Cycle" 
+                                                            Grid.IsSharedSizeScope="True" 
+                                                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
+                                                            KeyboardNavigation.TabNavigation="Cycle"/>
+                                        </Grid>
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsSuspendingPopupAnimation" Value="True">
+                            <Setter Property="PopupAnimation" TargetName="PART_Popup" Value="None"/>
+                        </Trigger>
+                        <Trigger Property="Icon" Value="{x:Null}">
+                            <Setter Property="Visibility" TargetName="Icon" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter Property="Visibility" TargetName="GlyphPanel" Value="Visible"/>
+                            <Setter Property="Visibility" TargetName="Icon" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter Property="Background" TargetName="templateRoot" Value="{StaticResource Paramerus.HoverBackground}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="TextElement.Foreground" TargetName="templateRoot" Value="#FF707070"/>
+                            <Setter Property="Fill" TargetName="GlyphPanel" Value="#FF707070"/>
+                        </Trigger>
+                        <Trigger Property="CanContentScroll" SourceName="SubMenuScrollViewer" Value="False">
+                            <Setter Property="Canvas.Top" TargetName="OpaqueRect" Value="{Binding VerticalOffset, ElementName=SubMenuScrollViewer}"/>
+                            <Setter Property="Canvas.Left" TargetName="OpaqueRect" Value="{Binding HorizontalOffset, ElementName=SubMenuScrollViewer}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+
+    </Style>
+    
+    <Style x:Key="NavigListBoxItemStyle" TargetType="ListBoxItem">
+        <Setter Property="Width" Value="100"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    </Style>
+    
+    <Style x:Key="ParamerusChartPanelCustomStyle" TargetType="local:ParamerusChartPanel">
+        <Setter Property="MaxHeight" Value="400"/>
+        <Setter Property="Margin" Value="10,0,5,7"/>
+        
+    </Style>
+
+    <Style x:Key="AccordionMenuItemSizeStyle" TargetType="dxa:AccordionItem">
+        <Setter Property="Width" Value="240"/>
+        <Setter Property="Height" Value="40"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Background" Value="Transparent"/>
+    </Style>
+
+    <ControlTemplate x:Key="ChartPanel" TargetType="dxlc:GroupBox">
+        <dx:Container>
+            <Border x:Name="ChartPanelBorder"
+                    BorderThickness="1"
+                    BorderBrush="{StaticResource Paramerus.MainColor}"
+                    CornerRadius="{StaticResource Paramerus.CornerRadius}">
+                <dxlc:LayoutControl dx:DXSerializer.Enabled="False"
+                                    ItemSpace="0"
+                                    Orientation="Vertical"
+                                    Padding="0"
+                                    ScrollBars="None">
+                    <dxlc:LayoutGroup x:Name="Header"
+                                      Background="Transparent"
+                                      ItemSpace="0"
+                                      Padding="2"
+                                      Panel.ZIndex="0"
+                                      Visibility="{TemplateBinding TitleVisibility}">
+                        <Rectangle x:Name="TitleStretcher"
+                                   Visibility="Collapsed"
+                                   Width="0"/>
+                        <dx:DXContentPresenter x:Name="Title"
+                                               Content="{TemplateBinding Header}"
+                                               ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                               Foreground="{TemplateBinding TitleForeground}"
+                                               Margin="9,0"
+                                               VerticalAlignment="Center"/>
+                        <dxlc:GroupBoxButton x:Name="MaximizeElement"
+                                             AutomationProperties.Name="Maximize"
+                                             HorizontalAlignment="Right"
+                                             Margin="2,0,0,0"
+                                             VerticalAlignment="Center"
+                                             Visibility="{TemplateBinding MaximizeElementVisibility}"/>
+                    </dxlc:LayoutGroup>
+                   
+                    <dx:DXContentPresenter x:Name="Content"
+                                           Content="{TemplateBinding Content}"
+                                           ContentTemplate="{TemplateBinding CurrentContentTemplate}"
+                                           Foreground="{TemplateBinding TitleForeground}"
+                                           Margin="{TemplateBinding Padding}"/>
+                </dxlc:LayoutControl>
+            </Border>
+        </dx:Container>
+    </ControlTemplate>
+
+    <Style x:Key="ParamerusBorderStyle" TargetType="Border">
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Background" Value="{StaticResource Paramerus.HeaderBackground}"/>
+        <Setter Property="CornerRadius" Value="{StaticResource Paramerus.CornerRadius}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource Paramerus.HeaderSplitter}"/>
+    </Style>
+
+    <Style x:Key="BorderCloseButtonTrigger" TargetType="Border">
+        <Setter Property="BorderBrush" Value="Black"/>
+        <Setter Property="Width" Value="14"/>
+        <Setter Property="Height" Value="14"/>
+        <Setter Property="CornerRadius" Value="3,3,3,3"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Style.Triggers>
+            <Trigger Property="Border.IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource Paramerus.HoverBackground}"/>
+            </Trigger>
+            <DataTrigger Binding="{Binding Path=IsPressed, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}}"
+                         Value="True">
+                <Setter Property="Background" Value="{StaticResource Paramerus.MainColor}"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    
+    <Style x:Key="ParamerusChartPanelCloseButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Border x:Name="ButtonCloseBorder" 
+                            Style="{StaticResource BorderCloseButtonTrigger}">
+                        <Grid>
+                            <Line X1="3" Y1="3" X2="9" Y2="9" Stroke="Black" StrokeThickness="2"/>
+                            <Line X1="9" Y1="3" X2="3" Y2="9" Stroke="Black" StrokeThickness="2"/>
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        
+    </Style>
+
+    <local:CenterBorderGapMaskConverter x:Key="CenterBorderGapMaskConverter"/>
+    <Style x:Key="CenteredHeaderGroupBoxStyle" TargetType="{x:Type GroupBox}">
+        <Setter Property="BorderBrush" Value="#D5DFE5"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type GroupBox}">
+                    <Grid SnapsToDevicePixels="true">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="6"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="6"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="6"/>
+                        </Grid.RowDefinitions>
+                        <Border BorderBrush="Transparent" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Grid.ColumnSpan="4" Grid.Column="0" CornerRadius="4" Grid.Row="1" Grid.RowSpan="3"/>
+                        <Border Grid.ZIndex="2" x:Name="Header" Grid.Column="2" HorizontalAlignment="Center" Padding="3,1,3,0" Grid.Row="0" Grid.RowSpan="2">
+                            <ContentPresenter ContentSource="Header" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                        </Border>
+                        <ContentPresenter Grid.ColumnSpan="2" Grid.Column="1" Margin="{TemplateBinding Padding}" Grid.Row="2" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                        <Border RenderTransformOrigin="0.5,0.5" BorderBrush="White" BorderThickness="{TemplateBinding BorderThickness}" Grid.ColumnSpan="4" CornerRadius="4" Grid.Row="1" Grid.RowSpan="3">
+                            <Border.OpacityMask>
+                                <MultiBinding ConverterParameter="7" Converter="{StaticResource CenterBorderGapMaskConverter}">
+                                    <Binding ElementName="Header" Path="ActualWidth"/>
+                                    <Binding Path="ActualWidth" RelativeSource="{RelativeSource Self}"/>
+                                    <Binding Path="ActualHeight" RelativeSource="{RelativeSource Self}"/>
+                                </MultiBinding>
+                            </Border.OpacityMask>
+                            <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="3">
+                                <Border BorderBrush="White" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2"/>
+                            </Border>
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

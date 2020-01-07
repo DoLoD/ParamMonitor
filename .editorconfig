@@ -1,0 +1,10 @@
+﻿[*.cs]
+
+# CA1707: Идентификаторы не должны содержать символы подчеркивания
+dotnet_diagnostic.CA1707.severity = none
+
+# CA1721: Имена свойств не должны совпадать с именами методов get
+dotnet_diagnostic.CA1721.severity = none
+
+# CA2227: Свойства коллекций должны быть доступны только для чтения
+dotnet_diagnostic.CA2227.severity = none
