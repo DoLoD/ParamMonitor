@@ -179,7 +179,7 @@ namespace ParamerusStudio
 
         void PMBusDevicesDiscover()
         {
-           // StatusBar.Content = "Start finding SMBUS-Adapter";
+            StatusBar.Content = "Start finding SMBUS-Adapter";
             
             if(!PMBusInit())
             {
