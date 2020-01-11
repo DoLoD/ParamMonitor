@@ -5,6 +5,7 @@ using DevExpress.Xpf.WindowsUI;
 using ParamerusStudio.Components;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -100,12 +101,23 @@ namespace ParamerusStudio
     /// Логика взаимодействия для MainWindow.xaml
     /// </summary>
     /// 
-    public partial class MainWindow : DXWindow
+    public partial class MainWindow : DXWindow, INotifyPropertyChanged
     {
         ParamerusRegisterStatus Register_STATUS_VOUT;
         SMBusAdapter _smBusAdapter;
-        List<PMBusDevice> _devices;
+        private List<PMBusDevice> _pm_busDevices = new List<PMBusDevice>();
+        public List<PMBusDevice> PMBusDevices
+        {
+            get => _pm_busDevices;
+            set
+            {
+                _pm_busDevices = value;
+                OnPropertyChanged();
+            }
+        }
+        PMBusDevice _current_pm_bus_device = null;
 
+        
         public MainWindow()
         {
             InitializeComponent();
@@ -150,41 +162,89 @@ namespace ParamerusStudio
             Register_STATUS_VOUT.RegisterBits[3].CurrentStatusBit = BitStatus.Fault;
         }
 
-        private async void DXWindow_Loaded(object sender, RoutedEventArgs e)
+        private void DXWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            await Task.Factory.StartNew(PMBusDevicesDiscover).ConfigureAwait(false);
+            Task.Factory.StartNew(PMBusDevicesDiscover);
            
         }
 
-        private bool PMBusInit()
+
+        private bool SMBusAdaptherSearch()
         {
             if (SMBusAdapter.Discover() == 0)
                 return false;
             _smBusAdapter = SMBusAdapter.Adapter;
-            //LbSMBusVer.Text = _smBusAdapter.Version.ToString();
-            //LbSMBusAdapt.Text = _smBusAdapter.ToString().Substring(0, _smBusAdapter.ToString().IndexOf("pid_") + 9) + "]";
-            var opts = new PMBusDevice.DiscoverOptions();
-            opts.Scan_Mode = PMBusDevice.ScanMode.TPS53951;
-            if (PMBusDevice.Discover(opts) == 0)
-                return false;
-            _devices = PMBusDevice.Devices;
-            foreach (PMBusDevice dev in PMBusDevice.Devices)
-            {
-                //CbListPMBusDevice.Items.Add(dev.ToString());
-            }
-
-            //CbListPMBusDevice.SelectedIndex = 0;
             return true;
+        }
+
+        private bool PMBusSearch()
+        {
+            var opts = new PMBusDevice.DiscoverOptions();
+            opts.Scan_Mode = PMBusDevice.ScanMode.DeviceID;
+            if(PMBusDevice.Discover(opts) == 0)
+            {
+                opts.Scan_Mode = PMBusDevice.ScanMode.TPS53951;
+                if (PMBusDevice.Discover(opts) == 0)
+                    return false;
+            }
+            PMBusDevices = PMBusDevice.Devices;
+            cbDeviceList.Dispatcher.Invoke(() =>
+            {
+                cbDeviceList.SelectedIndex = 0;
+            });
+            _current_pm_bus_device = PMBusDevices[0];
+            return true;
+        }
+
+       // 0451/5f00
+        private bool PMBusInit()
+        {
+            if(!PMBusSearch())
+                return false;
+            return true;
+        }
+
+        void SetStatus(String newStatus)
+        {
+            StatusBar.Dispatcher.Invoke(() => StatusBar.Content = newStatus);
+        }
+
+        PMBusDevice GetSelectDevice()
+        {
+            if (PMBusDevices == null)
+                return null;
+            return PMBusDevices[cbDeviceList.SelectedIndex];
         }
 
         void PMBusDevicesDiscover()
         {
-            StatusBar.Content = "Start finding SMBUS-Adapter";
-            
-            if(!PMBusInit())
-            {
 
+            SetStatus("Searching SMBUS-Adapter...");
+            if(!SMBusAdaptherSearch())
+            {
+                SetStatus("SMBUS-Adapter not found.");
+                return;
             }
+            SetStatus("SMBus-Adapter found! Scanning PMBus-devices...");
+            if (!PMBusInit())
+            {
+                SetStatus("PMBus-devices not found!");
+                return;
+            }
+            SetStatus("PMBus-devices found!");
+        }
+
+        private void cbDeviceList_SelectedIndexChanged(object sender, RoutedEventArgs e)
+        {
+            if (PMBusDevices == null)
+                return;
+            _current_pm_bus_device = PMBusDevices[cbDeviceList.SelectedIndex];
+        }
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        void OnPropertyChanged([MemberCallerName] String name = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
     }
 }

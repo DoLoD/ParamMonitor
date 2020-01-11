@@ -14,3 +14,6 @@ dotnet_diagnostic.CA1303.severity = none
 
 # CA2008: Не создавайте задачи без передачи TaskScheduler
 dotnet_diagnostic.CA2008.severity = none
+
+# CS4014: Так как этот вызов не ожидается, выполнение существующего метода продолжается до тех пор, пока вызов не будет завершен
+dotnet_diagnostic.CS4014.severity = none

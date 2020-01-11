@@ -223,6 +223,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MemberCallerNameAttribute.cs" />
     <Compile Include="ParamerusChartPanel.xaml.cs">
       <DependentUpon>ParamerusChartPanel.xaml</DependentUpon>
     </Compile>
