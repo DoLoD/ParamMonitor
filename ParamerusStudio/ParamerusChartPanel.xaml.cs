@@ -99,7 +99,7 @@ namespace ParamerusStudio
                 var lg_legend = new LineGraph();
 
                 lg_legend.SetBinding(LineGraph.VisibilityProperty, new Binding() {Path=new PropertyPath("Visibility"),  Source=lg, Mode=BindingMode.TwoWay});
-                lg_legend.Description = String.Format("Data series {0}", i + 1);
+                lg_legend.Description = String.Format(CultureInfo.CurrentCulture, "Data series {0}", i + 1);
                 lg_legend.StrokeThickness = 2;
                 lg_legend.Stroke = new SolidColorBrush(Color.FromArgb(255, (byte)((i * 20) + 90), 0, 0));
                 lg.StrokeThickness = 2;

@@ -30,7 +30,7 @@
     
     <CornerRadius x:Key="Paramerus.CornerRadius" TopLeft="7" TopRight="7" BottomLeft="7" BottomRight="7"/>
 
-    <local:VisibilityToCheckedConverter x:Key="VisibilityToCheckedConverter"/>
+    
 
     <Style x:Key="ToggleButtonMenuStyle" BasedOn="{StaticResource {x:Type ToggleButton}}" TargetType="RadioButton">
         <Setter Property="Width" Value="100"/>
@@ -105,8 +105,7 @@
         </Style.Triggers>
     </Style>
 
-    <components:StatusRegisterToBackgroundConverter x:Key="SRToTitleBackgroundConverter"/>
-
+   
     <Style x:Key="ParamerusRegisterStatusGroupBoxStylle" TargetType="dxlc:GroupBox">
         <Setter Property="Width" Value="Auto"/>
         <Setter Property="Height" Value="Auto"/>
@@ -133,8 +132,9 @@
         <Setter Property="RowStyle" Value="{StaticResource RegisterGridRowBackgroundStyle}"/>
     </Style>
 
-    
-    <components:ParamerusRegisterStatus x:Key="Register_STATUS_VOUT" x:Name="Register_STATUS_VOUT">
+    <components:StatusRegisterToBackgroundConverter x:Key="SRToTitleBackgroundConverter"/>
+    <local:VisibilityToCheckedConverter x:Key="VisibilityToCheckedConverter"/>
+    <components:ParamerusRegisterStatus x:Key="Register_STATUS_VOUT">
         <components:ParamerusRegisterStatus.RegisterBits>
             <components:ParamerusRegisterBit NameBit="Vout OV Fault"
                                              CurrentStatusBit="Fault"

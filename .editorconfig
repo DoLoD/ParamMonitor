@@ -8,3 +8,9 @@ dotnet_diagnostic.CA1721.severity = none
 
 # CA2227: Свойства коллекций должны быть доступны только для чтения
 dotnet_diagnostic.CA2227.severity = none
+
+# CA1303: Не передавать литералы в качестве локализованных параметров
+dotnet_diagnostic.CA1303.severity = none
+
+# CA2008: Не создавайте задачи без передачи TaskScheduler
+dotnet_diagnostic.CA2008.severity = none

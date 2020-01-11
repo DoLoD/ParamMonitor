@@ -30,7 +30,7 @@
     ShowTitle="False"
     Title="MainWindow"
     WindowStyle="SingleBorderWindow"
-    Padding="0">
+    Padding="0" Loaded="DXWindow_Loaded">
 
 
     <dxc:DXWindow.HeaderItems>
@@ -127,9 +127,13 @@
                     <dxb:Bar.DockInfo>
                         <dxb:BarDockInfo ContainerType="Bottom" />
                     </dxb:Bar.DockInfo>
+                    <dxb:BarEditItem Name="StatusBar"
+                                     TextBlock.Foreground="White"
+                                     Content="Test"/>
                 </dxb:Bar>
+                
             </dxb:BarManager.Bars>
-            <ListView/>
+            
         </dxb:BarManager>
         <dxc:DXTabControl x:Name="TabControlNav"
                           BorderBrush="Transparent"
@@ -410,11 +414,26 @@
                                 </dxlc:GroupBox>
                                 
                             </dxlc:LayoutControl>
-                            <Button Content="On\Off"
-                                    Height="40"
-                                    VerticalAlignment="Bottom"
-                                    DockPanel.Dock="Bottom"
-                                    Background="{StaticResource Paramerus.HeaderBackground}"/>
+                            <component:ParamerusIndicButton Height="40"
+                                                            VerticalAlignment="Bottom"
+                                                            HorizontalAlignment="Stretch"
+                                                            HorizontalContentAlignment="Left"
+                                                            DockPanel.Dock="Bottom"
+                                                            CurrentStateIndex="0"
+                                                            VerticalContentAlignment="Center"
+                                                            HorizontalIndicatorAlignment="Right"
+                                                            VerticalIndicatorAlignment="Center"
+                                                            MarginContent="10,0,0,0"
+                                                            MarginIndicator="0,0,20,0"
+                                                            IndicatorBackground="Green"
+                                                            IndicatorHeight="15"
+                                                            IndicatorWidth="15"
+                                                            Background="{StaticResource Paramerus.HeaderBackground}">
+                                <component:ParamerusIndicButton.StatesButton>
+                                    <sys:String>OFF</sys:String>
+                                    <sys:String>ON</sys:String>
+                                </component:ParamerusIndicButton.StatesButton>
+                            </component:ParamerusIndicButton>
                         </DockPanel>
                         
                     </Border>

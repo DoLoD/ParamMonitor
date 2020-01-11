@@ -11,16 +11,6 @@ using System.Windows.Media;
 
 namespace ParamerusStudio.Components
 {
-    public class EventList<T> : List<T>
-    {
-        public event EventHandler OnAdd;
-
-        public new void Add(T item) // "new" to avoid compiler-warnings, because we're hiding a method from base-class
-        {
-            base.Add(item);
-            OnAdd?.Invoke(this, null);
-        }
-    }
 
     public class StatusRegisterToBackgroundConverter : IValueConverter
     {
@@ -93,7 +83,7 @@ namespace ParamerusStudio.Components
 
     public class ParamerusRegisterStatus : INotifyPropertyChanged
     {
-        public EventList<ParamerusRegisterBit> RegisterBits { get; set; } = new EventList<ParamerusRegisterBit>();
+        public List<ParamerusRegisterBit> RegisterBits { get; set; } = new List<ParamerusRegisterBit>();
         private BitStatus _statusRegister = BitStatus.BitNotSet;
         public BitStatus StatusRegister
         {
@@ -105,7 +95,7 @@ namespace ParamerusStudio.Components
             }
         }
 
-        public ParamerusRegisterStatus(EventList<ParamerusRegisterBit> _registerBits)
+        public ParamerusRegisterStatus(List<ParamerusRegisterBit> _registerBits)
         {
             RegisterBits = _registerBits;
             if (RegisterBits == null)
@@ -119,7 +109,7 @@ namespace ParamerusStudio.Components
 
         public ParamerusRegisterStatus()
         {
-            RegisterBits.OnAdd += RegisterBits_OnAdd;
+
         }
 
         private void RegisterBits_OnAdd(object sender, EventArgs e)

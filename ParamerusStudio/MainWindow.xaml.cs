@@ -5,9 +5,11 @@ using DevExpress.Xpf.WindowsUI;
 using ParamerusStudio.Components;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,6 +20,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using TIDP.PMBus;
+using TIDP.SAA;
 
 namespace ParamerusStudio
 {
@@ -99,6 +103,9 @@ namespace ParamerusStudio
     public partial class MainWindow : DXWindow
     {
         ParamerusRegisterStatus Register_STATUS_VOUT;
+        SMBusAdapter _smBusAdapter;
+        List<PMBusDevice> _devices;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -141,6 +148,43 @@ namespace ParamerusStudio
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             Register_STATUS_VOUT.RegisterBits[3].CurrentStatusBit = BitStatus.Fault;
+        }
+
+        private async void DXWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            await Task.Factory.StartNew(PMBusDevicesDiscover).ConfigureAwait(false);
+           
+        }
+
+        private bool PMBusInit()
+        {
+            if (SMBusAdapter.Discover() == 0)
+                return false;
+            _smBusAdapter = SMBusAdapter.Adapter;
+            //LbSMBusVer.Text = _smBusAdapter.Version.ToString();
+            //LbSMBusAdapt.Text = _smBusAdapter.ToString().Substring(0, _smBusAdapter.ToString().IndexOf("pid_") + 9) + "]";
+            var opts = new PMBusDevice.DiscoverOptions();
+            opts.Scan_Mode = PMBusDevice.ScanMode.TPS53951;
+            if (PMBusDevice.Discover(opts) == 0)
+                return false;
+            _devices = PMBusDevice.Devices;
+            foreach (PMBusDevice dev in PMBusDevice.Devices)
+            {
+                //CbListPMBusDevice.Items.Add(dev.ToString());
+            }
+
+            //CbListPMBusDevice.SelectedIndex = 0;
+            return true;
+        }
+
+        void PMBusDevicesDiscover()
+        {
+           // StatusBar.Content = "Start finding SMBUS-Adapter";
+            
+            if(!PMBusInit())
+            {
+
+            }
         }
     }
 }
