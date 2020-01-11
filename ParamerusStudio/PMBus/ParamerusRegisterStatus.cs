@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace ParamerusStudio.Components
+namespace ParamerusStudio.PMBus
 {
 
     public class StatusRegisterToBackgroundConverter : IValueConverter
@@ -32,7 +32,31 @@ namespace ParamerusStudio.Components
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            return Binding.DoNothing;
+        }
+    }
+
+    public class StatusRegisterToForegroundConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null)
+                return Brushes.Black;
+            BitStatus bs = (BitStatus)value;
+            switch (bs)
+            {
+                case BitStatus.Fault:
+                    return Brushes.White;
+                case BitStatus.Warning:
+                    return Brushes.Black;
+                default:
+                    return Brushes.Black;
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return Binding.DoNothing;
         }
     }
 
@@ -83,7 +107,6 @@ namespace ParamerusStudio.Components
 
     public class ParamerusRegisterStatus : INotifyPropertyChanged
     {
-        public List<ParamerusRegisterBit> RegisterBits { get; set; } = new List<ParamerusRegisterBit>();
         private BitStatus _statusRegister = BitStatus.BitNotSet;
         public BitStatus StatusRegister
         {
@@ -94,6 +117,9 @@ namespace ParamerusStudio.Components
                 OnPropertyChanged();
             }
         }
+        public List<ParamerusRegisterBit> RegisterBits { get; set; } = new List<ParamerusRegisterBit>();
+        
+       
 
         public ParamerusRegisterStatus(List<ParamerusRegisterBit> _registerBits)
         {
@@ -112,6 +138,15 @@ namespace ParamerusStudio.Components
 
         }
 
+        public void SetValue(byte newVal)
+        {
+
+        }
+
+        public void SetNACK()
+        {
+            foreach(var bit in RegisterBits)
+        }
         private void RegisterBits_OnAdd(object sender, EventArgs e)
         {
             if(RegisterBits.Last() != null)

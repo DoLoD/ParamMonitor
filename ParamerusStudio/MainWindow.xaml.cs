@@ -3,12 +3,14 @@ using DevExpress.Xpf.Core;
 using DevExpress.Xpf.Editors;
 using DevExpress.Xpf.WindowsUI;
 using ParamerusStudio.Components;
+using ParamerusStudio.PMBus;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,7 +24,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using TIDP.PMBus;
+using TIDP.PMBus.Commands;
 using TIDP.SAA;
+using TIDP;
 
 namespace ParamerusStudio
 {
@@ -32,7 +36,7 @@ namespace ParamerusStudio
         // Methods
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            
+
             Type type = typeof(double);
             if (values == null
                 || values.Length != 3
@@ -95,6 +99,21 @@ namespace ParamerusStudio
             return new object[] { Binding.DoNothing };
         }
     }
+    public class RegisterStatusTableConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values[0] == null || !(values[1] is ParamerusRegisterStatus))
+                return null;
+            ParamerusRegisterStatus reg = values[1] as ParamerusRegisterStatus;
+            return reg.RegisterBits;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 
 
     /// <summary>
@@ -103,10 +122,11 @@ namespace ParamerusStudio
     /// 
     public partial class MainWindow : DXWindow, INotifyPropertyChanged
     {
-        ParamerusRegisterStatus Register_STATUS_VOUT;
+        
         SMBusAdapter _smBusAdapter;
-        private List<PMBusDevice> _pm_busDevices = new List<PMBusDevice>();
-        public List<PMBusDevice> PMBusDevices
+        private List<ParamerusPMBusDevice> _pm_busDevices = new List<ParamerusPMBusDevice>();
+        private ParamerusPMBusDevice _сurrentPmBusDevice;
+        public List<ParamerusPMBusDevice> PMBusDevices
         {
             get => _pm_busDevices;
             set
@@ -115,13 +135,21 @@ namespace ParamerusStudio
                 OnPropertyChanged();
             }
         }
-        PMBusDevice _current_pm_bus_device = null;
+        public ParamerusPMBusDevice CurrentPmBusDevice
+        {
+            get => _сurrentPmBusDevice;
+            set
+            {
+                _сurrentPmBusDevice = value;
+                CurrentPmBusDevice.Update();
+                OnPropertyChanged();
+            }
+        }
 
-        
+
         public MainWindow()
         {
             InitializeComponent();
-            Register_STATUS_VOUT = (ParamerusRegisterStatus)FindResource("Register_STATUS_VOUT");
 
         }
 
@@ -159,13 +187,13 @@ namespace ParamerusStudio
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            Register_STATUS_VOUT.RegisterBits[3].CurrentStatusBit = BitStatus.Fault;
+            
         }
 
         private void DXWindow_Loaded(object sender, RoutedEventArgs e)
         {
             Task.Factory.StartNew(PMBusDevicesDiscover);
-           
+
         }
 
 
@@ -181,25 +209,30 @@ namespace ParamerusStudio
         {
             var opts = new PMBusDevice.DiscoverOptions();
             opts.Scan_Mode = PMBusDevice.ScanMode.DeviceID;
-            if(PMBusDevice.Discover(opts) == 0)
+            if (PMBusDevice.Discover(opts) == 0)
             {
                 opts.Scan_Mode = PMBusDevice.ScanMode.TPS53951;
                 if (PMBusDevice.Discover(opts) == 0)
                     return false;
             }
-            PMBusDevices = PMBusDevice.Devices;
+            List<ParamerusPMBusDevice> listDevices = new List<ParamerusPMBusDevice>();
+            foreach(var dev in PMBusDevice.Devices)
+            {
+                listDevices.Add(new ParamerusPMBusDevice(dev));
+            }
+            PMBusDevices = listDevices;
             cbDeviceList.Dispatcher.Invoke(() =>
             {
                 cbDeviceList.SelectedIndex = 0;
             });
-            _current_pm_bus_device = PMBusDevices[0];
+            CurrentPmBusDevice = PMBusDevices[0];
             return true;
         }
 
-       // 0451/5f00
+        // 0451/5f00
         private bool PMBusInit()
         {
-            if(!PMBusSearch())
+            if (!PMBusSearch())
                 return false;
             return true;
         }
@@ -209,7 +242,7 @@ namespace ParamerusStudio
             StatusBar.Dispatcher.Invoke(() => StatusBar.Content = newStatus);
         }
 
-        PMBusDevice GetSelectDevice()
+        ParamerusPMBusDevice GetSelectDevice()
         {
             if (PMBusDevices == null)
                 return null;
@@ -220,7 +253,7 @@ namespace ParamerusStudio
         {
 
             SetStatus("Searching SMBUS-Adapter...");
-            if(!SMBusAdaptherSearch())
+            if (!SMBusAdaptherSearch())
             {
                 SetStatus("SMBUS-Adapter not found.");
                 return;
@@ -238,13 +271,47 @@ namespace ParamerusStudio
         {
             if (PMBusDevices == null)
                 return;
-            _current_pm_bus_device = PMBusDevices[cbDeviceList.SelectedIndex];
+            if (cbDeviceList.SelectedIndex == -1)
+                cbDeviceList.SelectedIndex = 0;
+            CurrentPmBusDevice = PMBusDevices[cbDeviceList.SelectedIndex];
         }
         public event PropertyChangedEventHandler PropertyChanged;
 
-        void OnPropertyChanged([MemberCallerName] String name = "")
+        void OnPropertyChanged([CallerMemberName] String name = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
+        
+        private void ParamerusIndicButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (PMBusDevices == null)
+                return;
+            
+        }
+
+        void OutListParamDevs(PMBusDevice dev)
+        {
+            Debug.WriteLine("ID\tCode\tRail\tRead Only?\tStatus\tDecoded\tDecoded Formated\tEncoded");
+
+            foreach (ParameterBase param in dev.Commands.Parameters)
+            {
+
+                if (param.Is_Meta_Command)
+                    continue;
+
+                if (!param.Show_To_User || !param.Phase_Available() || param.Is_Write_Only)
+                    continue;
+
+                param.Refresh();
+
+
+                Debug.WriteLine(StringUtils.Join("\t", param.ID, param.Code, param.Page.Number,
+                    (param.Is_Read_Only_Parameter) ? "Yes" : "No",
+                    PMBusUtils.ACK_NACK(param.Last_Status), // "ACK" or "NACK"
+                    param.oLatest_No_Immediate, param.Latest_No_Immediate_Formatted,
+                    param.oLatest_Encoded_No_Immediate));
+            }
+        }
     }
-}
+    }
+

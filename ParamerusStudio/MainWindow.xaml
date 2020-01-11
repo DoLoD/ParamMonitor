@@ -191,7 +191,6 @@
                                         </Grid.RowDefinitions>
                                         <TextBlock Text="Vin:"
                                                HorizontalAlignment="Left"
-                                               
                                                Grid.Row="0" 
                                                Grid.Column="0"
                                                Margin="5,0,4,4"/>
@@ -425,9 +424,10 @@
                                                             VerticalIndicatorAlignment="Center"
                                                             MarginContent="10,0,0,0"
                                                             MarginIndicator="0,0,20,0"
-                                                            IndicatorBackground="Green"
+                                                            IndicatorBackground="Red"
                                                             IndicatorHeight="15"
                                                             IndicatorWidth="15"
+                                                            Click="ParamerusIndicButton_Click"
                                                             Background="{StaticResource Paramerus.HeaderBackground}">
                                 <component:ParamerusIndicButton.StatesButton>
                                     <sys:String>OFF</sys:String>
@@ -455,15 +455,24 @@
                                                         Width="205"
                                                         ScrollBars="None"
                                                         Padding="0,5,0,0" >
-
+                                
                                 <dxlc:GroupBox Style="{StaticResource ParamerusRegisterStatusGroupBoxStylle}"
-                                               Header="STATUS_VOUT"
-                                               TitleBackground="{StaticResource Paramerus.RegisterBitFaultColor}">
+                                               DataContext="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Status_VOUT}"
+                                               TitleBackground="{Binding StatusRegister, Converter={StaticResource SRToTitleBackgroundConverter}}"
+                                               TitleForeground="{Binding StatusRegister, Converter={StaticResource SRToTitleForegroundConverter}}"
+                                               Header="STATUS_VOUT">
                                     <DataGrid Name="Register_STATUS_VOUT_Table" 
                                               SelectedCellsChanged="DataGrid_SelectedCellsChanged"
-                                              Style="{StaticResource ParamerusRegisterStatusDataGridStyle}"
-                                              ItemsSource="{Binding Source={StaticResource Register_STATUS_VOUT}, Path=RegisterBits}">
-                                            <DataGrid.Columns>
+                                              DataContext="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
+                                              Foreground="{Binding StatusRegister, Converter={StaticResource SRToTitleForegroundConverter}}"
+                                              Style="{StaticResource ParamerusRegisterStatusDataGridStyle}">
+                                        <DataGrid.ItemsSource>
+                                            <MultiBinding Converter="{StaticResource RegStatusTableConverter}">
+                                                <Binding ElementName="mainWindow" Path="CurrentPmBusDevice"/>
+                                                <Binding Path="Status_VOUT"/>
+                                            </MultiBinding>
+                                        </DataGrid.ItemsSource>
+                                        <DataGrid.Columns>
                                                 <DataGridTextColumn Binding="{Binding Path=BitNum}"
                                                                     Width="Auto"/>
                                                 <DataGridTextColumn Binding="{Binding Path=NameBit}"
@@ -473,13 +482,22 @@
 
                                     </dxlc:GroupBox>
                                 <dxlc:GroupBox Style="{StaticResource ParamerusRegisterStatusGroupBoxStylle}"
-                                               Header="STATUS_IOUT"
-                                               TitleBackground="{StaticResource Paramerus.RegisterBitWarningColor}">
+                                               DataContext="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Status_IOUT}"
+                                               TitleBackground="{Binding StatusRegister, Converter={StaticResource SRToTitleBackgroundConverter}}"
+                                               TitleForeground="{Binding StatusRegister, Converter={StaticResource SRToTitleForegroundConverter}}"
+                                               Header="STATUS_IOUT">
 
                                     <DataGrid Name="Register_STATUS_IOUT_Table" 
                                               SelectedCellsChanged="DataGrid_SelectedCellsChanged"
-                                                   Style="{StaticResource ParamerusRegisterStatusDataGridStyle}"
-                                                   ItemsSource="{Binding Source={StaticResource Register_STATUS_IOUT}, Path=RegisterBits}">
+                                              DataContext="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
+                                              Foreground="{Binding StatusRegister, Converter={StaticResource SRToTitleForegroundConverter}}"
+                                              Style="{StaticResource ParamerusRegisterStatusDataGridStyle}">
+                                        <DataGrid.ItemsSource>
+                                            <MultiBinding Converter="{StaticResource RegStatusTableConverter}">
+                                                <Binding ElementName="mainWindow" Path="CurrentPmBusDevice"/>
+                                                <Binding Path="Status_IOUT"/>
+                                            </MultiBinding>
+                                        </DataGrid.ItemsSource>
                                             <DataGrid.Columns>
                                                 <DataGridTextColumn Binding="{Binding Path=BitNum}"
                                                                     Width="Auto"/>
@@ -490,11 +508,21 @@
 
                                     </dxlc:GroupBox>
                                 <dxlc:GroupBox Style="{StaticResource ParamerusRegisterStatusGroupBoxStylle}"
-                                                   Header="STATUS_TEMP">
+                                               DataContext="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Status_TEMP}"
+                                               TitleBackground="{Binding StatusRegister, Converter={StaticResource SRToTitleBackgroundConverter}}"
+                                               TitleForeground="{Binding StatusRegister, Converter={StaticResource SRToTitleForegroundConverter}}"
+                                               Header="STATUS_TEMP">
                                     <DataGrid Name="Register_STATUS_TEM_Table" 
                                               SelectedCellsChanged="DataGrid_SelectedCellsChanged"
-                                                  Style="{StaticResource ParamerusRegisterStatusDataGridStyle}"
-                                              ItemsSource="{Binding Source={StaticResource Register_STATUS_TEMP}, Path=RegisterBits}">
+                                              Style="{StaticResource ParamerusRegisterStatusDataGridStyle}"
+                                              DataContext="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
+                                              Foreground="{Binding StatusRegister, Converter={StaticResource SRToTitleForegroundConverter}}">
+                                        <DataGrid.ItemsSource>
+                                            <MultiBinding Converter="{StaticResource RegStatusTableConverter}">
+                                                <Binding ElementName="mainWindow" Path="CurrentPmBusDevice"/>
+                                                <Binding Path="Status_TEMP"/>
+                                            </MultiBinding>
+                                        </DataGrid.ItemsSource>
                                         <DataGrid.Columns>
                                             <DataGridTextColumn Binding="{Binding Path=BitNum}"
                                                                     Width="Auto"/>
@@ -504,11 +532,21 @@
                                     </DataGrid>
                                 </dxlc:GroupBox>
                                 <dxlc:GroupBox Style="{StaticResource ParamerusRegisterStatusGroupBoxStylle}"
+                                               DataContext="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Status_CML}"
+                                               TitleBackground="{Binding StatusRegister, Converter={StaticResource SRToTitleBackgroundConverter}}"
+                                               TitleForeground="{Binding StatusRegister, Converter={StaticResource SRToTitleForegroundConverter}}"
                                                Header="STATUS_CML">
                                     <DataGrid Name="Register_STATUS_CML_Table" 
                                               SelectedCellsChanged="DataGrid_SelectedCellsChanged"
-                                                  Style="{StaticResource ParamerusRegisterStatusDataGridStyle}"
-                                              ItemsSource="{Binding Source={StaticResource Register_STATUS_CML}, Path=RegisterBits}">
+                                              DataContext="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
+                                              Foreground="{Binding StatusRegister, Converter={StaticResource SRToTitleForegroundConverter}}"
+                                              Style="{StaticResource ParamerusRegisterStatusDataGridStyle}">
+                                        <DataGrid.ItemsSource>
+                                            <MultiBinding Converter="{StaticResource RegStatusTableConverter}">
+                                                <Binding ElementName="mainWindow" Path="CurrentPmBusDevice"/>
+                                                <Binding Path="Status_CML"/>
+                                            </MultiBinding>
+                                        </DataGrid.ItemsSource>
                                         <DataGrid.Columns>
                                             <DataGridTextColumn Binding="{Binding Path=BitNum}"
                                                                     Width="Auto"/>
@@ -518,11 +556,21 @@
                                     </DataGrid>
                                     </dxlc:GroupBox>
                                 <dxlc:GroupBox Style="{StaticResource ParamerusRegisterStatusGroupBoxStylle}"
+                                               DataContext="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Status_INPUT}"
+                                               TitleBackground="{Binding StatusRegister, Converter={StaticResource SRToTitleBackgroundConverter}}"
+                                               TitleForeground="{Binding StatusRegister, Converter={StaticResource SRToTitleForegroundConverter}}"
                                                Header="STATUS_INPUT">
                                     <DataGrid Name="Register_STATUS_INPUT_Table" 
                                               SelectedCellsChanged="DataGrid_SelectedCellsChanged"
-                                                  Style="{StaticResource ParamerusRegisterStatusDataGridStyle}"
-                                              ItemsSource="{Binding Source={StaticResource Register_STATUS_INPUT}, Path=RegisterBits}">
+                                              DataContext="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
+                                              Foreground="{Binding StatusRegister, Converter={StaticResource SRToTitleForegroundConverter}}"
+                                              Style="{StaticResource ParamerusRegisterStatusDataGridStyle}">
+                                        <DataGrid.ItemsSource>
+                                            <MultiBinding Converter="{StaticResource RegStatusTableConverter}">
+                                                <Binding ElementName="mainWindow" Path="CurrentPmBusDevice"/>
+                                                <Binding Path="Status_INPUT"/>
+                                            </MultiBinding>
+                                        </DataGrid.ItemsSource>
                                         <DataGrid.Columns>
                                             <DataGridTextColumn Binding="{Binding Path=BitNum}"
                                                                     Width="Auto"/>
@@ -532,11 +580,21 @@
                                     </DataGrid>
                                     </dxlc:GroupBox>
                                 <dxlc:GroupBox Style="{StaticResource ParamerusRegisterStatusGroupBoxStylle}"
-                                                   Header="STATUS_FANS_1_2">
+                                               DataContext="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Status_Fans_1_2}"
+                                               TitleBackground="{Binding StatusRegister, Converter={StaticResource SRToTitleBackgroundConverter}}"
+                                               TitleForeground="{Binding StatusRegister, Converter={StaticResource SRToTitleForegroundConverter}}"
+                                               Header="STATUS_FANS_1_2">
                                     <DataGrid Name="Register_STATUS_FANS_1_2_Table" 
                                               SelectedCellsChanged="DataGrid_SelectedCellsChanged"
-                                                  Style="{StaticResource ParamerusRegisterStatusDataGridStyle}"
-                                              ItemsSource="{Binding Source={StaticResource Register_STATUS_Fans_1_2}, Path=RegisterBits}">
+                                              DataContext="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
+                                              Foreground="{Binding StatusRegister, Converter={StaticResource SRToTitleForegroundConverter}}"
+                                              Style="{StaticResource ParamerusRegisterStatusDataGridStyle}">
+                                        <DataGrid.ItemsSource>
+                                            <MultiBinding Converter="{StaticResource RegStatusTableConverter}">
+                                                <Binding ElementName="mainWindow" Path="CurrentPmBusDevice"/>
+                                                <Binding Path="Status_Fans_1_2"/>
+                                            </MultiBinding>
+                                        </DataGrid.ItemsSource>
                                         <DataGrid.Columns>
                                             <DataGridTextColumn Binding="{Binding Path=BitNum}"
                                                                     Width="Auto"/>
@@ -546,11 +604,21 @@
                                     </DataGrid>
                                     </dxlc:GroupBox>
                                 <dxlc:GroupBox Style="{StaticResource ParamerusRegisterStatusGroupBoxStylle}"
-                                                   Header="STATUS_FANS_3_4">
+                                               DataContext="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Status_Fans_3_4}"
+                                               TitleBackground="{Binding StatusRegister, Converter={StaticResource SRToTitleBackgroundConverter}}"
+                                               TitleForeground="{Binding StatusRegister, Converter={StaticResource SRToTitleForegroundConverter}}"
+                                               Header="STATUS_FANS_3_4">
                                     <DataGrid Name="Register_STATUS_FANS_3_4_Table" 
                                               SelectedCellsChanged="DataGrid_SelectedCellsChanged"
-                                                  Style="{StaticResource ParamerusRegisterStatusDataGridStyle}"
-                                              ItemsSource="{Binding Source={StaticResource Register_STATUS_Fans_3_4}, Path=RegisterBits}">
+                                              DataContext="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
+                                              Foreground="{Binding StatusRegister, Converter={StaticResource SRToTitleForegroundConverter}}"
+                                              Style="{StaticResource ParamerusRegisterStatusDataGridStyle}">
+                                        <DataGrid.ItemsSource>
+                                            <MultiBinding Converter="{StaticResource RegStatusTableConverter}">
+                                                <Binding ElementName="mainWindow" Path="CurrentPmBusDevice"/>
+                                                <Binding Path="Status_Fans_3_4"/>
+                                            </MultiBinding>
+                                        </DataGrid.ItemsSource>
                                         <DataGrid.Columns>
                                             <DataGridTextColumn Binding="{Binding Path=BitNum}"
                                                                     Width="Auto"/>
@@ -560,11 +628,21 @@
                                     </DataGrid>
                                     </dxlc:GroupBox>
                                 <dxlc:GroupBox Style="{StaticResource ParamerusRegisterStatusGroupBoxStylle}"
-                                                   Header="STATUS_MFR_SPECIFIC">
+                                               DataContext="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Status_Mfr_Specific}"
+                                               TitleBackground="{Binding StatusRegister, Converter={StaticResource SRToTitleBackgroundConverter}}"
+                                               TitleForeground="{Binding StatusRegister, Converter={StaticResource SRToTitleForegroundConverter}}"
+                                               Header="STATUS_MFR_SPECIFIC">
                                     <DataGrid Name="Register_STATUS_MFR_Table" 
                                               SelectedCellsChanged="DataGrid_SelectedCellsChanged"
-                                                  Style="{StaticResource ParamerusRegisterStatusDataGridStyle}"
-                                              ItemsSource="{Binding Source={StaticResource Register_STATUS_MFR_SPECIFIC}, Path=RegisterBits}">
+                                              DataContext="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
+                                              Foreground="{Binding StatusRegister, Converter={StaticResource SRToTitleForegroundConverter}}"
+                                              Style="{StaticResource ParamerusRegisterStatusDataGridStyle}">
+                                        <DataGrid.ItemsSource>
+                                            <MultiBinding Converter="{StaticResource RegStatusTableConverter}">
+                                                <Binding ElementName="mainWindow" Path="CurrentPmBusDevice"/>
+                                                <Binding Path="Status_Mfr_Specific"/>
+                                            </MultiBinding>
+                                        </DataGrid.ItemsSource>
                                         <DataGrid.Columns>
                                             <DataGridTextColumn Binding="{Binding Path=BitNum}"
                                                                     Width="Auto"/>
@@ -574,11 +652,21 @@
                                     </DataGrid>
                                     </dxlc:GroupBox>
                                 <dxlc:GroupBox Style="{StaticResource ParamerusRegisterStatusGroupBoxStylle}"
-                                                   Header="STATUS_OTHER">
+                                               DataContext="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Status_Other}"
+                                               TitleBackground="{Binding StatusRegister, Converter={StaticResource SRToTitleBackgroundConverter}}"
+                                               TitleForeground="{Binding StatusRegister, Converter={StaticResource SRToTitleForegroundConverter}}"
+                                               Header="STATUS_OTHER">
                                     <DataGrid Name="Register_STATUS_OTHER_Table" 
                                               SelectedCellsChanged="DataGrid_SelectedCellsChanged"
-                                              Style="{StaticResource ParamerusRegisterStatusDataGridStyle}"
-                                              ItemsSource="{Binding Source={StaticResource Register_STATUS_OTHER}, Path=RegisterBits}">
+                                              DataContext="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
+                                              Foreground="{Binding StatusRegister, Converter={StaticResource SRToTitleForegroundConverter}}"
+                                              Style="{StaticResource ParamerusRegisterStatusDataGridStyle}">
+                                        <DataGrid.ItemsSource>
+                                            <MultiBinding Converter="{StaticResource RegStatusTableConverter}">
+                                                <Binding ElementName="mainWindow" Path="CurrentPmBusDevice"/>
+                                                <Binding Path="Status_Other"/>
+                                            </MultiBinding>
+                                        </DataGrid.ItemsSource>
                                         <DataGrid.Columns>
                                             <DataGridTextColumn Binding="{Binding Path=BitNum}"
                                                                     Width="Auto"/>

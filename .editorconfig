@@ -17,3 +17,12 @@ dotnet_diagnostic.CA2008.severity = none
 
 # CS4014: Так как этот вызов не ожидается, выполнение существующего метода продолжается до тех пор, пока вызов не будет завершен
 dotnet_diagnostic.CS4014.severity = none
+
+# CA1305: Укажите IFormatProvider
+dotnet_diagnostic.CA1305.severity = none
+
+# IDE0040: Добавьте модификаторы доступности
+dotnet_style_require_accessibility_modifiers = for_non_interface_members:none
+
+# CA1812: PMCommandClearFaults является внутренним классом, экземпляр которого никогда не создается. Если это так, удалите код из сборки. Если этот класс должен содержать только статические методы, сделайте его статическим (Shared в Visual Basic).
+dotnet_diagnostic.CA1812.severity = none

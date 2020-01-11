@@ -8,7 +8,7 @@ using TIDP.PMBus.Standard.Commands;
 
 namespace MaterialSkinDemo.PMBus.Commands
 {
-    class PMCommandOperation : PMCommand
+    internal class PMCommandOperation : PMCommand
     {
         public PMCommandOperation(PMBusDevice dev) : base(dev, "OPERATION")
         {}

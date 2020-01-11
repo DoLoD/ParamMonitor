@@ -208,7 +208,7 @@
     <Compile Include="Components\ParamerusIndicButton.xaml.cs">
       <DependentUpon>ParamerusIndicButton.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Components\ParamerusRegisterStatus.cs" />
+    <Compile Include="PMBus\ParamerusRegisterStatus.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -223,7 +223,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MemberCallerNameAttribute.cs" />
     <Compile Include="ParamerusChartPanel.xaml.cs">
       <DependentUpon>ParamerusChartPanel.xaml</DependentUpon>
     </Compile>
@@ -233,7 +232,7 @@
     <Compile Include="PMBus\Commands\CommandsBase.cs" />
     <Compile Include="PMBus\Commands\IPMCommand.cs" />
     <Compile Include="PMBus\Commands\PMCommand.cs" />
-    <Compile Include="PMBus\CommandUpdater.cs" />
+    <Compile Include="PMBus\ParamerusPMBusDevice.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

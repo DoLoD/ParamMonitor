@@ -6,7 +6,8 @@
                     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
                     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
                     xmlns:dxwui="http://schemas.devexpress.com/winfx/2008/xaml/windowsui"
-                    xmlns:components="clr-namespace:ParamerusStudio.Components">
+                    xmlns:components="clr-namespace:ParamerusStudio.Components"
+                    xmlns:pmbus="clr-namespace:ParamerusStudio.PMBus">
 
     <SolidColorBrush x:Key="Paramerus.MainColor" Color="#FFC20000"/>
     <SolidColorBrush x:Key="Paramerus.HeaderSplitter" Color="#FFAEAEAE"/>
@@ -30,7 +31,8 @@
     
     <CornerRadius x:Key="Paramerus.CornerRadius" TopLeft="7" TopRight="7" BottomLeft="7" BottomRight="7"/>
 
-    
+    <local:RegisterStatusTableConverter x:Key="RegStatusTableConverter"/>
+
 
     <Style x:Key="ToggleButtonMenuStyle" BasedOn="{StaticResource {x:Type ToggleButton}}" TargetType="RadioButton">
         <Setter Property="Width" Value="100"/>
@@ -132,192 +134,193 @@
         <Setter Property="RowStyle" Value="{StaticResource RegisterGridRowBackgroundStyle}"/>
     </Style>
 
-    <components:StatusRegisterToBackgroundConverter x:Key="SRToTitleBackgroundConverter"/>
+    <pmbus:StatusRegisterToBackgroundConverter x:Key="SRToTitleBackgroundConverter"/>
+    <pmbus:StatusRegisterToForegroundConverter x:Key="SRToTitleForegroundConverter"/>
     <local:VisibilityToCheckedConverter x:Key="VisibilityToCheckedConverter"/>
-    <components:ParamerusRegisterStatus x:Key="Register_STATUS_VOUT">
-        <components:ParamerusRegisterStatus.RegisterBits>
-            <components:ParamerusRegisterBit NameBit="Vout OV Fault"
+    <pmbus:ParamerusRegisterStatus x:Key="Register_STATUS_VOUT">
+        <pmbus:ParamerusRegisterStatus.RegisterBits>
+            <pmbus:ParamerusRegisterBit NameBit="Vout OV Fault"
                                              CurrentStatusBit="Fault"
                                              BitNum="7"/>
-            <components:ParamerusRegisterBit NameBit="Vout OV Warning"
+            <pmbus:ParamerusRegisterBit NameBit="Vout OV Warning"
                                              CurrentStatusBit="Warning"
                                              BitNum="6"/>
-            <components:ParamerusRegisterBit NameBit="Vout UV Warning"
+            <pmbus:ParamerusRegisterBit NameBit="Vout UV Warning"
                                              CurrentStatusBit="BitNotImplemented"
                                              BitNum="5"/>
-            <components:ParamerusRegisterBit NameBit="Vout UV Fault"
+            <pmbus:ParamerusRegisterBit NameBit="Vout UV Fault"
                                              BitNum="4"/>
-            <components:ParamerusRegisterBit NameBit="VOUT_MAX Warning"
+            <pmbus:ParamerusRegisterBit NameBit="VOUT_MAX Warning"
                                              BitNum="3"/>
-            <components:ParamerusRegisterBit NameBit="TON_MAX Fault"
+            <pmbus:ParamerusRegisterBit NameBit="TON_MAX Fault"
                                              BitNum="2"/>
-            <components:ParamerusRegisterBit NameBit="TOFF_MAX Warning"
+            <pmbus:ParamerusRegisterBit NameBit="TOFF_MAX Warning"
                                              BitNum="1"/>
-            <components:ParamerusRegisterBit NameBit="Vout Tracking Error"
+            <pmbus:ParamerusRegisterBit NameBit="Vout Tracking Error"
                                              BitNum="0"/>
-        </components:ParamerusRegisterStatus.RegisterBits>
-    </components:ParamerusRegisterStatus>
-    <components:ParamerusRegisterStatus x:Key="Register_STATUS_IOUT">
-        <components:ParamerusRegisterStatus.RegisterBits>
-            <components:ParamerusRegisterBit NameBit="IOUT OV Fault"
+        </pmbus:ParamerusRegisterStatus.RegisterBits>
+    </pmbus:ParamerusRegisterStatus>
+    <pmbus:ParamerusRegisterStatus x:Key="Register_STATUS_IOUT">
+        <pmbus:ParamerusRegisterStatus.RegisterBits>
+            <pmbus:ParamerusRegisterBit NameBit="IOUT OV Fault"
                                              CurrentStatusBit="Warning"
                                              BitNum="7"/>
-            <components:ParamerusRegisterBit NameBit="IOUT OC Fault with LV Shutdown"
+            <pmbus:ParamerusRegisterBit NameBit="IOUT OC Fault with LV Shutdown"
                                              BitNum="6"/>
-            <components:ParamerusRegisterBit NameBit="IOUT OC Fault"
+            <pmbus:ParamerusRegisterBit NameBit="IOUT OC Fault"
                                              BitNum="5"/>
-            <components:ParamerusRegisterBit NameBit="IOUT UC Fault"
+            <pmbus:ParamerusRegisterBit NameBit="IOUT UC Fault"
                                              BitNum="4"/>
-            <components:ParamerusRegisterBit NameBit="Current Share Fault"
+            <pmbus:ParamerusRegisterBit NameBit="Current Share Fault"
                                              BitNum="3"/>
-            <components:ParamerusRegisterBit NameBit="Power Limiting Mode"
+            <pmbus:ParamerusRegisterBit NameBit="Power Limiting Mode"
                                              BitNum="2"/>
-            <components:ParamerusRegisterBit NameBit="POUT OP Fault"
+            <pmbus:ParamerusRegisterBit NameBit="POUT OP Fault"
                                              BitNum="1"/>
-            <components:ParamerusRegisterBit NameBit="POUT OP Warning"
+            <pmbus:ParamerusRegisterBit NameBit="POUT OP Warning"
                                              BitNum="0"/>
-        </components:ParamerusRegisterStatus.RegisterBits>
-    </components:ParamerusRegisterStatus>
-    <components:ParamerusRegisterStatus x:Key="Register_STATUS_TEMP">
-        <components:ParamerusRegisterStatus.RegisterBits>
-            <components:ParamerusRegisterBit NameBit="OT Fault"
+        </pmbus:ParamerusRegisterStatus.RegisterBits>
+    </pmbus:ParamerusRegisterStatus>
+    <pmbus:ParamerusRegisterStatus x:Key="Register_STATUS_TEMP">
+        <pmbus:ParamerusRegisterStatus.RegisterBits>
+            <pmbus:ParamerusRegisterBit NameBit="OT Fault"
                                              BitNum="7"/>
-            <components:ParamerusRegisterBit NameBit="OT Warning"
+            <pmbus:ParamerusRegisterBit NameBit="OT Warning"
                                              BitNum="6"/>
-            <components:ParamerusRegisterBit NameBit="UT Fault"
+            <pmbus:ParamerusRegisterBit NameBit="UT Fault"
                                              BitNum="5"/>
-            <components:ParamerusRegisterBit NameBit="UT Warning"
+            <pmbus:ParamerusRegisterBit NameBit="UT Warning"
                                              BitNum="4"/>
-            <components:ParamerusRegisterBit NameBit="Reserved"
+            <pmbus:ParamerusRegisterBit NameBit="Reserved"
                                              BitNum="3"/>
-            <components:ParamerusRegisterBit NameBit="Reserved"
+            <pmbus:ParamerusRegisterBit NameBit="Reserved"
                                              BitNum="2"/>
-            <components:ParamerusRegisterBit NameBit="Reserved"
+            <pmbus:ParamerusRegisterBit NameBit="Reserved"
                                              BitNum="1"/>
-            <components:ParamerusRegisterBit NameBit="Reserved"
+            <pmbus:ParamerusRegisterBit NameBit="Reserved"
                                              BitNum="0"/>
-        </components:ParamerusRegisterStatus.RegisterBits>
-    </components:ParamerusRegisterStatus>
-    <components:ParamerusRegisterStatus x:Key="Register_STATUS_CML">
-        <components:ParamerusRegisterStatus.RegisterBits>
-            <components:ParamerusRegisterBit NameBit="Invalid Command"
+        </pmbus:ParamerusRegisterStatus.RegisterBits>
+    </pmbus:ParamerusRegisterStatus>
+    <pmbus:ParamerusRegisterStatus x:Key="Register_STATUS_CML">
+        <pmbus:ParamerusRegisterStatus.RegisterBits>
+            <pmbus:ParamerusRegisterBit NameBit="Invalid Command"
                                              BitNum="7"/>
-            <components:ParamerusRegisterBit NameBit="Invalid Data"
+            <pmbus:ParamerusRegisterBit NameBit="Invalid Data"
                                              BitNum="6"/>
-            <components:ParamerusRegisterBit NameBit="PEC Fault"
+            <pmbus:ParamerusRegisterBit NameBit="PEC Fault"
                                              BitNum="5"/>
-            <components:ParamerusRegisterBit NameBit="Memory Fault"
+            <pmbus:ParamerusRegisterBit NameBit="Memory Fault"
                                              BitNum="4"/>
-            <components:ParamerusRegisterBit NameBit="Processor Fault"
+            <pmbus:ParamerusRegisterBit NameBit="Processor Fault"
                                              BitNum="3"/>
-            <components:ParamerusRegisterBit NameBit="Reserved"
+            <pmbus:ParamerusRegisterBit NameBit="Reserved"
                                              BitNum="2"/>
-            <components:ParamerusRegisterBit NameBit="Other Comms Fault"
+            <pmbus:ParamerusRegisterBit NameBit="Other Comms Fault"
                                              BitNum="1"/>
-            <components:ParamerusRegisterBit NameBit="Other Memory/Logic Fault"
+            <pmbus:ParamerusRegisterBit NameBit="Other Memory/Logic Fault"
                                              BitNum="0"/>
-        </components:ParamerusRegisterStatus.RegisterBits>
-    </components:ParamerusRegisterStatus>
-    <components:ParamerusRegisterStatus x:Key="Register_STATUS_INPUT">
-        <components:ParamerusRegisterStatus.RegisterBits>
-            <components:ParamerusRegisterBit NameBit="Vin OV Fault"
+        </pmbus:ParamerusRegisterStatus.RegisterBits>
+    </pmbus:ParamerusRegisterStatus>
+    <pmbus:ParamerusRegisterStatus x:Key="Register_STATUS_INPUT">
+        <pmbus:ParamerusRegisterStatus.RegisterBits>
+            <pmbus:ParamerusRegisterBit NameBit="Vin OV Fault"
                                              BitNum="7"/>
-            <components:ParamerusRegisterBit NameBit="Vin OV Warning"
+            <pmbus:ParamerusRegisterBit NameBit="Vin OV Warning"
                                              BitNum="6"/>
-            <components:ParamerusRegisterBit NameBit="Vin UV Warning"
+            <pmbus:ParamerusRegisterBit NameBit="Vin UV Warning"
                                              BitNum="5"/>
-            <components:ParamerusRegisterBit NameBit="Vin UV Fault"
+            <pmbus:ParamerusRegisterBit NameBit="Vin UV Fault"
                                              BitNum="4"/>
-            <components:ParamerusRegisterBit NameBit="Unit off: Insufficient Vin"
+            <pmbus:ParamerusRegisterBit NameBit="Unit off: Insufficient Vin"
                                              BitNum="3"/>
-            <components:ParamerusRegisterBit NameBit="IIN OC Fault"
+            <pmbus:ParamerusRegisterBit NameBit="IIN OC Fault"
                                              BitNum="2"/>
-            <components:ParamerusRegisterBit NameBit="IIN OC Warning"
+            <pmbus:ParamerusRegisterBit NameBit="IIN OC Warning"
                                              BitNum="1"/>
-            <components:ParamerusRegisterBit NameBit="PIN OP Warning"
+            <pmbus:ParamerusRegisterBit NameBit="PIN OP Warning"
                                              BitNum="0"/>
-        </components:ParamerusRegisterStatus.RegisterBits>
-    </components:ParamerusRegisterStatus>
-    <components:ParamerusRegisterStatus x:Key="Register_STATUS_Fans_1_2">
-        <components:ParamerusRegisterStatus.RegisterBits>
-            <components:ParamerusRegisterBit NameBit="Fan 1 Fault"
+        </pmbus:ParamerusRegisterStatus.RegisterBits>
+    </pmbus:ParamerusRegisterStatus>
+    <pmbus:ParamerusRegisterStatus x:Key="Register_STATUS_Fans_1_2">
+        <pmbus:ParamerusRegisterStatus.RegisterBits>
+            <pmbus:ParamerusRegisterBit NameBit="Fan 1 Fault"
                                              BitNum="7"/>
-            <components:ParamerusRegisterBit NameBit="Fan 2 Fault"
+            <pmbus:ParamerusRegisterBit NameBit="Fan 2 Fault"
                                              BitNum="6"/>
-            <components:ParamerusRegisterBit NameBit="Fan 1 Warning"
+            <pmbus:ParamerusRegisterBit NameBit="Fan 1 Warning"
                                              BitNum="5"/>
-            <components:ParamerusRegisterBit NameBit="Fan 2 Warning"
+            <pmbus:ParamerusRegisterBit NameBit="Fan 2 Warning"
                                              BitNum="4"/>
-            <components:ParamerusRegisterBit NameBit="Fan 1 Speed Overridden"
+            <pmbus:ParamerusRegisterBit NameBit="Fan 1 Speed Overridden"
                                              BitNum="3"/>
-            <components:ParamerusRegisterBit NameBit="Fan 2 Speed Overridden"
+            <pmbus:ParamerusRegisterBit NameBit="Fan 2 Speed Overridden"
                                              BitNum="2"/>
-            <components:ParamerusRegisterBit NameBit="Air Flow Fault"
+            <pmbus:ParamerusRegisterBit NameBit="Air Flow Fault"
                                              BitNum="1"/>
-            <components:ParamerusRegisterBit NameBit="Air Flow Warning"
+            <pmbus:ParamerusRegisterBit NameBit="Air Flow Warning"
                                              BitNum="0"/>
-        </components:ParamerusRegisterStatus.RegisterBits>
-    </components:ParamerusRegisterStatus>
-    <components:ParamerusRegisterStatus x:Key="Register_STATUS_Fans_3_4">
-        <components:ParamerusRegisterStatus.RegisterBits>
-            <components:ParamerusRegisterBit NameBit="Fan 3 Fault"
+        </pmbus:ParamerusRegisterStatus.RegisterBits>
+    </pmbus:ParamerusRegisterStatus>
+    <pmbus:ParamerusRegisterStatus x:Key="Register_STATUS_Fans_3_4">
+        <pmbus:ParamerusRegisterStatus.RegisterBits>
+            <pmbus:ParamerusRegisterBit NameBit="Fan 3 Fault"
                                              BitNum="7"/>
-            <components:ParamerusRegisterBit NameBit="Fan 4 Fault"
+            <pmbus:ParamerusRegisterBit NameBit="Fan 4 Fault"
                                              BitNum="6"/>
-            <components:ParamerusRegisterBit NameBit="Fan 3 Warning"
+            <pmbus:ParamerusRegisterBit NameBit="Fan 3 Warning"
                                              BitNum="5"/>
-            <components:ParamerusRegisterBit NameBit="Fan 4 Warning"
+            <pmbus:ParamerusRegisterBit NameBit="Fan 4 Warning"
                                              BitNum="4"/>
-            <components:ParamerusRegisterBit NameBit="Fan 3 Speed Overridden"
+            <pmbus:ParamerusRegisterBit NameBit="Fan 3 Speed Overridden"
                                              BitNum="3"/>
-            <components:ParamerusRegisterBit NameBit="Fan 4 Speed Overridden"
+            <pmbus:ParamerusRegisterBit NameBit="Fan 4 Speed Overridden"
                                              BitNum="2"/>
-            <components:ParamerusRegisterBit NameBit="Reserved"
+            <pmbus:ParamerusRegisterBit NameBit="Reserved"
                                              BitNum="1"/>
-            <components:ParamerusRegisterBit NameBit="Reserved"
+            <pmbus:ParamerusRegisterBit NameBit="Reserved"
                                              BitNum="0"/>
-        </components:ParamerusRegisterStatus.RegisterBits>
-    </components:ParamerusRegisterStatus>
-    <components:ParamerusRegisterStatus x:Key="Register_STATUS_MFR_SPECIFIC">
-        <components:ParamerusRegisterStatus.RegisterBits>
-            <components:ParamerusRegisterBit NameBit="Manufacturer 7"
+        </pmbus:ParamerusRegisterStatus.RegisterBits>
+    </pmbus:ParamerusRegisterStatus>
+    <pmbus:ParamerusRegisterStatus x:Key="Register_STATUS_MFR_SPECIFIC">
+        <pmbus:ParamerusRegisterStatus.RegisterBits>
+            <pmbus:ParamerusRegisterBit NameBit="Manufacturer 7"
                                              BitNum="7"/>
-            <components:ParamerusRegisterBit NameBit="Manufacturer 6"
+            <pmbus:ParamerusRegisterBit NameBit="Manufacturer 6"
                                              BitNum="6"/>
-            <components:ParamerusRegisterBit NameBit="Manufacturer 5"
+            <pmbus:ParamerusRegisterBit NameBit="Manufacturer 5"
                                              BitNum="5"/>
-            <components:ParamerusRegisterBit NameBit="Manufacturer 4"
+            <pmbus:ParamerusRegisterBit NameBit="Manufacturer 4"
                                              BitNum="4"/>
-            <components:ParamerusRegisterBit NameBit="Manufacturer 3"
+            <pmbus:ParamerusRegisterBit NameBit="Manufacturer 3"
                                              BitNum="3"/>
-            <components:ParamerusRegisterBit NameBit="Manufacturer 2"
+            <pmbus:ParamerusRegisterBit NameBit="Manufacturer 2"
                                              BitNum="2"/>
-            <components:ParamerusRegisterBit NameBit="Manufacturer 1"
+            <pmbus:ParamerusRegisterBit NameBit="Manufacturer 1"
                                              BitNum="1"/>
-            <components:ParamerusRegisterBit NameBit="Manufacturer 0"
+            <pmbus:ParamerusRegisterBit NameBit="Manufacturer 0"
                                              BitNum="0"/>
-        </components:ParamerusRegisterStatus.RegisterBits>
-    </components:ParamerusRegisterStatus>
-    <components:ParamerusRegisterStatus x:Key="Register_STATUS_OTHER">
-        <components:ParamerusRegisterStatus.RegisterBits>
-            <components:ParamerusRegisterBit NameBit="Reserved"
+        </pmbus:ParamerusRegisterStatus.RegisterBits>
+    </pmbus:ParamerusRegisterStatus>
+    <pmbus:ParamerusRegisterStatus x:Key="Register_STATUS_OTHER">
+        <pmbus:ParamerusRegisterStatus.RegisterBits>
+            <pmbus:ParamerusRegisterBit NameBit="Reserved"
                                              BitNum="7"/>
-            <components:ParamerusRegisterBit NameBit="Reserved"
+            <pmbus:ParamerusRegisterBit NameBit="Reserved"
                                              BitNum="6"/>
-            <components:ParamerusRegisterBit NameBit="Input A fuse rr circuit breaker fault"
+            <pmbus:ParamerusRegisterBit NameBit="Input A fuse rr circuit breaker fault"
                                              BitNum="5"/>
-            <components:ParamerusRegisterBit NameBit="Input B fuse Or circuit breaker fault"
+            <pmbus:ParamerusRegisterBit NameBit="Input B fuse Or circuit breaker fault"
                                              BitNum="4"/>
-            <components:ParamerusRegisterBit NameBit="Input A OR-ing device fault"
+            <pmbus:ParamerusRegisterBit NameBit="Input A OR-ing device fault"
                                              BitNum="3"/>
-            <components:ParamerusRegisterBit NameBit="Input B OR-ing device fault"
+            <pmbus:ParamerusRegisterBit NameBit="Input B OR-ing device fault"
                                              BitNum="2"/>
-            <components:ParamerusRegisterBit NameBit="Output OR-ing device fault"
+            <pmbus:ParamerusRegisterBit NameBit="Output OR-ing device fault"
                                              BitNum="1"/>
-            <components:ParamerusRegisterBit NameBit="Reserved"
+            <pmbus:ParamerusRegisterBit NameBit="Reserved"
                                              BitNum="0"/>
-        </components:ParamerusRegisterStatus.RegisterBits>
-    </components:ParamerusRegisterStatus>
+        </pmbus:ParamerusRegisterStatus.RegisterBits>
+    </pmbus:ParamerusRegisterStatus>
     
     <ControlTemplate x:Key="ParamerusLowItemStyle" TargetType="{x:Type MenuItem}">
         <Border x:Name="templateRoot" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
