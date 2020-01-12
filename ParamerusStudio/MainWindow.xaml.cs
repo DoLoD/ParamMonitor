@@ -30,75 +30,10 @@ using TIDP;
 
 namespace ParamerusStudio
 {
-
-    public class CenterBorderGapMaskConverter : IMultiValueConverter
-    {
-        // Methods
-        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
-        {
-
-            Type type = typeof(double);
-            if (values == null
-                || values.Length != 3
-                || values[0] == null
-                || values[1] == null
-                || values[2] == null
-                || !type.IsAssignableFrom(values[0].GetType())
-                || !type.IsAssignableFrom(values[1].GetType())
-                || !type.IsAssignableFrom(values[2].GetType()))
-            {
-                return DependencyProperty.UnsetValue;
-            }
-
-            double pixels = (double)values[0];
-            double width = (double)values[1];
-            double height = (double)values[2];
-            if ((width == 0.0) || (height == 0.0))
-            {
-                return null;
-            }
-            Grid visual = new Grid();
-            visual.Width = width;
-            visual.Height = height;
-            ColumnDefinition colDefinition1 = new ColumnDefinition();
-            ColumnDefinition colDefinition2 = new ColumnDefinition();
-            ColumnDefinition colDefinition3 = new ColumnDefinition();
-            colDefinition1.Width = new GridLength(1.0, GridUnitType.Star);
-            colDefinition2.Width = new GridLength(pixels);
-            colDefinition3.Width = new GridLength(1.0, GridUnitType.Star);
-            visual.ColumnDefinitions.Add(colDefinition1);
-            visual.ColumnDefinitions.Add(colDefinition2);
-            visual.ColumnDefinitions.Add(colDefinition3);
-            RowDefinition rowDefinition1 = new RowDefinition();
-            RowDefinition rowDefinition2 = new RowDefinition();
-            rowDefinition1.Height = new GridLength(height / 2.0);
-            rowDefinition2.Height = new GridLength(1.0, GridUnitType.Star);
-            visual.RowDefinitions.Add(rowDefinition1);
-            visual.RowDefinitions.Add(rowDefinition2);
-            Rectangle rectangle1 = new Rectangle();
-            Rectangle rectangle2 = new Rectangle();
-            Rectangle rectangle3 = new Rectangle();
-            rectangle1.Fill = Brushes.Black;
-            rectangle2.Fill = Brushes.Black;
-            rectangle3.Fill = Brushes.Black;
-            Grid.SetRowSpan(rectangle1, 2);
-            Grid.SetRow(rectangle1, 0);
-            Grid.SetColumn(rectangle1, 0);
-            Grid.SetRow(rectangle2, 1);
-            Grid.SetColumn(rectangle2, 1);
-            Grid.SetRowSpan(rectangle3, 2);
-            Grid.SetRow(rectangle3, 0);
-            Grid.SetColumn(rectangle3, 2);
-            visual.Children.Add(rectangle1);
-            visual.Children.Add(rectangle2);
-            visual.Children.Add(rectangle3);
-            return new VisualBrush(visual);
-        }
-        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
-        {
-            return new object[] { Binding.DoNothing };
-        }
-    }
+    #region Converters
+    /// <summary>
+    /// Конвертер значений, преобразовывающий регистр статуса в коллекцию бит
+    /// </summary>
     public class RegisterStatusTableConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
@@ -114,7 +49,70 @@ namespace ParamerusStudio
             throw new NotImplementedException();
         }
     }
+    /// <summary>
+    /// Конвертер значений, преобразовывающий состояние контрольной линии, в состояние индикаторной кнопки
+    /// </summary>
+    public class StatusControlLineToStateIndicButtonConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null || !(value is ParamerusPMBusDevice))
+                return 0;
+            ParamerusPMBusDevice dev = value as ParamerusPMBusDevice;
+            LogicLevelResult stat_control_line = dev.ControlLineStatus();
+            if (!stat_control_line.Success)
+                return 0;
+            if (stat_control_line.Level == LogicLevel.Low)
+                return 0;
+            else
+                return 1;
+        }
 
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return Binding.DoNothing;
+        }
+    }
+    /// <summary>
+    /// Конвертер значений, преобразовывающий состояние статусного регистра в цвет индикатора на кнопке
+    /// </summary>
+    public class StatusRegsToIndicatorButtonBacgroundConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if(values.Contains(null) || values.Contains(Binding.DoNothing))
+                return Brushes.Red;
+
+            LogicLevelResult res = values[1] as LogicLevelResult;
+            if (!res.Success || res.Level == LogicLevel.Low)
+                return Brushes.Red;
+
+            bool isWarningBitSet = false;
+            for(int i=2;i<values.Length;i++)
+            {
+                BitStatus bs = (BitStatus)values[i];
+                switch (bs)
+                {
+                    case BitStatus.Fault:
+                        return Brushes.Red;
+                    case BitStatus.Warning:
+                        isWarningBitSet = true;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            if (isWarningBitSet)
+                return Brushes.Orange;
+            return Brushes.Green;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            return (object[])Binding.DoNothing;
+        }
+    }
+    #endregion
 
     /// <summary>
     /// Логика взаимодействия для MainWindow.xaml
@@ -123,9 +121,15 @@ namespace ParamerusStudio
     public partial class MainWindow : DXWindow, INotifyPropertyChanged
     {
         
-        SMBusAdapter _smBusAdapter;
+        /// <summary>
+        /// Найденный SMBus адаптер
+        /// </summary>
+        private SMBusAdapter _smBusAdapter;
         private List<ParamerusPMBusDevice> _pm_busDevices = new List<ParamerusPMBusDevice>();
         private ParamerusPMBusDevice _сurrentPmBusDevice;
+        /// <summary>
+        /// Найденные PMBus устройства
+        /// </summary>
         public List<ParamerusPMBusDevice> PMBusDevices
         {
             get => _pm_busDevices;
@@ -135,13 +139,16 @@ namespace ParamerusStudio
                 OnPropertyChanged();
             }
         }
+        /// <summary>
+        /// Выбранное PMBus устройство, при изменении выбранного устройства, производит считывание всех параметров устройства
+        /// </summary>
         public ParamerusPMBusDevice CurrentPmBusDevice
         {
             get => _сurrentPmBusDevice;
             set
             {
                 _сurrentPmBusDevice = value;
-                CurrentPmBusDevice.Update();
+                Dispatcher.Invoke(()=> _сurrentPmBusDevice.Update());
                 OnPropertyChanged();
             }
         }
@@ -150,33 +157,24 @@ namespace ParamerusStudio
         public MainWindow()
         {
             InitializeComponent();
-
         }
 
-        private void NavigMenu_SelectedItemChanged(object sender, AccordionSelectedItemChangedEventArgs e)
-        {
-            AccordionItem item = e.NewItem as AccordionItem;
-            if ((String)item.Header == "Система")
-                TabControlNav.SelectedIndex = 0;
-            if ((String)item.Header == "Конфигурация")
-                TabControlNav.SelectedIndex = 1;
-            if ((String)item.Header == "Панель управления")
-                TabControlNav.SelectedIndex = 2;
-            if ((String)item.Header == "Мониторинг")
-                TabControlNav.SelectedIndex = 3;
 
-        }
-
-        private void NavigBtn_Checked(object sender, RoutedEventArgs e)
-        {
-
-        }
-
+        /// <summary>
+        /// Реализация возможно перемещение окна приложения, при зажатии кнопки на логотипе
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Image_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             this.DragMove();
         }
 
+        /// <summary>
+        /// Событие выбора ячейки в таблицах статусов регистров, запрещает выделение
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void DataGrid_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
         {
             if (sender == null || !(sender is DataGrid))
@@ -185,88 +183,56 @@ namespace ParamerusStudio
             dataGrid.SelectedItem = null;
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            
-        }
-
-        private void DXWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-            Task.Factory.StartNew(PMBusDevicesDiscover);
-
-        }
+        /// <summary>
+        /// Запуск потока поиска подключенных устройств
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DXWindow_Loaded(object sender, RoutedEventArgs e) => Task.Factory.StartNew(PMBusDevicesDiscover);
 
 
-        private bool SMBusAdaptherSearch()
-        {
-            if (SMBusAdapter.Discover() == 0)
-                return false;
-            _smBusAdapter = SMBusAdapter.Adapter;
-            return true;
-        }
-
-        private bool PMBusSearch()
-        {
-            var opts = new PMBusDevice.DiscoverOptions();
-            opts.Scan_Mode = PMBusDevice.ScanMode.DeviceID;
-            if (PMBusDevice.Discover(opts) == 0)
-            {
-                opts.Scan_Mode = PMBusDevice.ScanMode.TPS53951;
-                if (PMBusDevice.Discover(opts) == 0)
-                    return false;
-            }
-            List<ParamerusPMBusDevice> listDevices = new List<ParamerusPMBusDevice>();
-            foreach(var dev in PMBusDevice.Devices)
-            {
-                listDevices.Add(new ParamerusPMBusDevice(dev));
-            }
-            PMBusDevices = listDevices;
-            cbDeviceList.Dispatcher.Invoke(() =>
-            {
-                cbDeviceList.SelectedIndex = 0;
-            });
-            CurrentPmBusDevice = PMBusDevices[0];
-            return true;
-        }
-
-        // 0451/5f00
-        private bool PMBusInit()
-        {
-            if (!PMBusSearch())
-                return false;
-            return true;
-        }
-
+        /// <summary>
+        /// Изменение текста в статус баре внизу окна
+        /// </summary>
+        /// <param name="newStatus"></param>
         void SetStatus(String newStatus)
         {
             StatusBar.Dispatcher.Invoke(() => StatusBar.Content = newStatus);
         }
 
-        ParamerusPMBusDevice GetSelectDevice()
-        {
-            if (PMBusDevices == null)
-                return null;
-            return PMBusDevices[cbDeviceList.SelectedIndex];
-        }
-
+        /// <summary>
+        /// Поиск подключенных PMBus устройств
+        /// </summary>
         void PMBusDevicesDiscover()
         {
 
             SetStatus("Searching SMBUS-Adapter...");
-            if (!SMBusAdaptherSearch())
+            _smBusAdapter = ParamerusPMBusDevice.SMBusAdaptherSearch();
+            if (_smBusAdapter == null)
             {
                 SetStatus("SMBUS-Adapter not found.");
                 return;
             }
             SetStatus("SMBus-Adapter found! Scanning PMBus-devices...");
-            if (!PMBusInit())
+            PMBusDevices = ParamerusPMBusDevice.PMBusInit();
+            if (PMBusDevices == null || PMBusDevices.Count == 0)
             {
                 SetStatus("PMBus-devices not found!");
                 return;
             }
+            cbDeviceList.Dispatcher.Invoke(() =>
+            {
+                cbDeviceList.SelectedIndex = 0;
+            });
+            CurrentPmBusDevice = PMBusDevices[0];
             SetStatus("PMBus-devices found!");
         }
 
+        /// <summary>
+        /// Событие изменения выбранного устройства
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cbDeviceList_SelectedIndexChanged(object sender, RoutedEventArgs e)
         {
             if (PMBusDevices == null)
@@ -282,34 +248,48 @@ namespace ParamerusStudio
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
         
-        private void ParamerusIndicButton_Click(object sender, RoutedEventArgs e)
+        
+        /// <summary>
+        /// Событие изменения состояния индикаторной кнопки
+        /// </summary>
+        /// <param name="sender">Кнопка, вызвавшая событие</param>
+        /// <param name="oldState">Старое состояние кнопки</param>
+        /// <param name="newState">Новое состояние кнопки</param>
+        private void ParamerusIndicButton_StateIndexChanged(object sender, int oldState, int newState)
         {
-            if (PMBusDevices == null)
-                return;
             
-        }
-
-        void OutListParamDevs(PMBusDevice dev)
-        {
-            Debug.WriteLine("ID\tCode\tRail\tRead Only?\tStatus\tDecoded\tDecoded Formated\tEncoded");
-
-            foreach (ParameterBase param in dev.Commands.Parameters)
+            if(newState == 1)
             {
+                if (PMBusDevices == null || CurrentPmBusDevice == null)
+                {
+                    ParamerusIndicButton pib = sender as ParamerusIndicButton;
+                    pib.CurrentStateIndex = 0;
+                    return;
+                }
+                if(CurrentPmBusDevice.ControlLineSetHigh())
+                {
+                    SetStatus("CONTROL LINE is High");
+                }
+                else
+                {
+                    ParamerusIndicButton pib = sender as ParamerusIndicButton;
+                    pib.CurrentStateIndex = 0;
+                    SetStatus("Error set CONTROL LINE to High");
+                }
+            }
+            else
+            {
+                if (PMBusDevices == null || CurrentPmBusDevice == null)
+                    return;
+                if (CurrentPmBusDevice.ControlLineSetLow())
+                {
+                    SetStatus("CONTROL LINE is Low");
+                }
+                else
+                {
+                    SetStatus("Error set CONTROL LINE to Low");
+                }
 
-                if (param.Is_Meta_Command)
-                    continue;
-
-                if (!param.Show_To_User || !param.Phase_Available() || param.Is_Write_Only)
-                    continue;
-
-                param.Refresh();
-
-
-                Debug.WriteLine(StringUtils.Join("\t", param.ID, param.Code, param.Page.Number,
-                    (param.Is_Read_Only_Parameter) ? "Yes" : "No",
-                    PMBusUtils.ACK_NACK(param.Last_Status), // "ACK" or "NACK"
-                    param.oLatest_No_Immediate, param.Latest_No_Immediate_Formatted,
-                    param.oLatest_Encoded_No_Immediate));
             }
         }
     }

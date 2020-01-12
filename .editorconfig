@@ -26,3 +26,6 @@ dotnet_style_require_accessibility_modifiers = for_non_interface_members:none
 
 # CA1812: PMCommandClearFaults является внутренним классом, экземпляр которого никогда не создается. Если это так, удалите код из сборки. Если этот класс должен содержать только статические методы, сделайте его статическим (Shared в Visual Basic).
 dotnet_diagnostic.CA1812.severity = none
+
+# CA1062: Проверить аргументы или открытые методы
+dotnet_diagnostic.CA1062.severity = none

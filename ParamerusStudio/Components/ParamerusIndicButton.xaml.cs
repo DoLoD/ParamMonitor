@@ -18,6 +18,9 @@ using System.Windows.Shapes;
 
 namespace ParamerusStudio.Components
 {
+    /// <summary>
+    /// Конвертер значений, возвращающий текст текущего состояния кнопки из коллекции состояний и индекса нового состояния.
+    /// </summary>
     public class StatesButtonConverter : IMultiValueConverter
     {
 
@@ -42,23 +45,51 @@ namespace ParamerusStudio.Components
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            return (object[])Binding.DoNothing;
         }
     }
 
     /// <summary>
-    /// Логика взаимодействия для ParamerusIndicButton.xaml
+    /// Класс, описывающий функциона индикаторной кнопки
     /// </summary>
     public partial class ParamerusIndicButton : UserControl, INotifyPropertyChanged
     {
+        #region Static region
+        /// <summary>
+        /// Цвета фона индикатора
+        /// </summary>
         public static readonly DependencyProperty IndicatorBackgroundProperty = DependencyProperty.Register("IndicatorBackground", typeof(Brush), typeof(ParamerusIndicButton));
+        /// <summary>
+        /// Коллекция состояний кнопки
+        /// </summary>
         public static readonly DependencyProperty StatesButtonProperty = DependencyProperty.Register("StatesButton", typeof(List<String>), typeof(ParamerusIndicButton), new PropertyMetadata(new List<String>()));
+        /// <summary>
+        /// Индекс текущего состояния
+        /// </summary>
         public static readonly DependencyProperty CurrentStateIndexProperty = DependencyProperty.Register("CurrentStateIndex", typeof(int), typeof(ParamerusIndicButton), new PropertyMetadata(0, OnStateIndexPropertyChanged));
+        /// <summary>
+        /// Горизонтальное выравнивание индикатора
+        /// </summary>
         public static readonly DependencyProperty HorizontalIndicatorAlignmentProperty = DependencyProperty.Register("HorizontalIndicatorAlignment", typeof(HorizontalAlignment), typeof(ParamerusIndicButton));
+        /// <summary>
+        /// Вертикальное выравнивание индикатора
+        /// </summary>
         public static readonly DependencyProperty VerticalIndicatorAlignmentProperty = DependencyProperty.Register("VerticalIndicatorAlignment", typeof(VerticalAlignment), typeof(ParamerusIndicButton));
+        /// <summary>
+        /// Отступ индикатора
+        /// </summary>
         public static readonly DependencyProperty MarginIndicatorProperty = DependencyProperty.Register("MarginIndicator", typeof(Thickness), typeof(ParamerusIndicButton));
+        /// <summary>
+        /// Отступ контента кнопки
+        /// </summary>
         public static readonly DependencyProperty MarginContentProperty = DependencyProperty.Register("MarginContent", typeof(Thickness), typeof(ParamerusIndicButton));
+        /// <summary>
+        /// Ширина индикатора
+        /// </summary>
         public static readonly DependencyProperty IndicatorWidthProperty = DependencyProperty.Register("IndicatorWidth", typeof(double), typeof(ParamerusIndicButton),new PropertyMetadata(5.0));
+        /// <summary>
+        /// Высота индикатора
+        /// </summary>
         public static readonly DependencyProperty IndicatorHeightProperty = DependencyProperty.Register("IndicatorHeight", typeof(double), typeof(ParamerusIndicButton), new PropertyMetadata(5.0));
 
         private static void OnStateIndexPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -67,13 +98,9 @@ namespace ParamerusStudio.Components
             sender.StateIndexChanged?.Invoke(sender, (int)e.OldValue, (int)e.NewValue);
         }
 
-
-        
+        #endregion
         public delegate void StateIndexChangedDelegate(object sender, int oldState, int newState);
-
         public event StateIndexChangedDelegate StateIndexChanged;
-        public event RoutedEventHandler Click;
-
         public HorizontalAlignment HorizontalIndicatorAlignment
         {
             get
@@ -175,25 +202,19 @@ namespace ParamerusStudio.Components
                 SetValue(IndicatorBackgroundProperty, value);
             }
         }
-
-
         public ParamerusIndicButton()
         {
             InitializeComponent();
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        public void OnPropertyChanged([CallerMemberName] String name="")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
-
+        } 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            
+            int oldVal = CurrentStateIndex;
             CurrentStateIndex = (CurrentStateIndex < (StatesButton.Count - 1)) ? CurrentStateIndex + 1 : 0;
-            Click?.Invoke(this, null);
-
+        }
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void OnPropertyChanged([CallerMemberName] String name = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
     }
 }

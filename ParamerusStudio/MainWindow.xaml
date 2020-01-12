@@ -73,7 +73,7 @@
     </dxc:DXWindow.HeaderItems>
 
     <Window.Resources>
-        <ResourceDictionary Source="ComponentStyles.xaml" />
+        <ResourceDictionary Source="/ParamerusStudio;component/Components/ComponentStyles.xaml" />
     </Window.Resources>
 
     <DockPanel>
@@ -414,21 +414,36 @@
                                 
                             </dxlc:LayoutControl>
                             <component:ParamerusIndicButton Height="40"
+                                                            DataContext="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
                                                             VerticalAlignment="Bottom"
                                                             HorizontalAlignment="Stretch"
                                                             HorizontalContentAlignment="Left"
                                                             DockPanel.Dock="Bottom"
-                                                            CurrentStateIndex="0"
                                                             VerticalContentAlignment="Center"
                                                             HorizontalIndicatorAlignment="Right"
                                                             VerticalIndicatorAlignment="Center"
                                                             MarginContent="10,0,0,0"
                                                             MarginIndicator="0,0,20,0"
-                                                            IndicatorBackground="Red"
                                                             IndicatorHeight="15"
                                                             IndicatorWidth="15"
-                                                            Click="ParamerusIndicButton_Click"
+                                                            CurrentStateIndex="{Binding Converter={StaticResource StatusControlLineConv},FallbackValue=0}"
+                                                            StateIndexChanged="ParamerusIndicButton_StateIndexChanged"
                                                             Background="{StaticResource Paramerus.HeaderBackground}">
+                                <component:ParamerusIndicButton.IndicatorBackground>
+                                    <MultiBinding Converter="{StaticResource StatRegToIndBackgroundConv}">
+                                        <Binding />
+                                        <Binding Path="ControlLine"/>
+                                        <Binding Path="Status_VOUT.StatusRegister"/>
+                                        <Binding Path="Status_IOUT.StatusRegister"/>
+                                        <Binding Path="Status_TEMP.StatusRegister"/>
+                                        <Binding Path="Status_CML.StatusRegister"/>
+                                        <Binding Path="Status_INPUT.StatusRegister"/>
+                                        <Binding Path="Status_Fans_1_2.StatusRegister"/>
+                                        <Binding Path="Status_Fans_3_4.StatusRegister"/>
+                                        <Binding Path="Status_Mfr_Specific.StatusRegister"/>
+                                        <Binding Path="Status_Other.StatusRegister"/>
+                                    </MultiBinding>
+                                </component:ParamerusIndicButton.IndicatorBackground>
                                 <component:ParamerusIndicButton.StatesButton>
                                     <sys:String>OFF</sys:String>
                                     <sys:String>ON</sys:String>
@@ -688,7 +703,6 @@
                             </dxlc:GroupBox>
                             <Button Content="Status Map"
                                     Height="40"
-                                    Click="Button_Click"
                                     Background="{StaticResource Paramerus.HeaderBackground}"/>
                         </dxlc:LayoutControl>
                     </Border>
