@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ParamerusStudio.VirtualDevice;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -52,7 +53,18 @@ namespace ParamerusStudio.PMBus
         public static SMBusAdapter SMBusAdaptherSearch()
         {
             if (SMBusAdapter.Discover() == 0)
-                return null;
+            {
+#if VIRTUAL_DEVICE
+                SMBusAdapter.Register_Driver(new VirtualDeviceDriverFactory());
+                if (SMBusAdapter.Discover() == 0)
+                {
+#endif
+                    return null;
+#if VIRTUAL_DEVICE
+            }
+#endif
+            }
+                
             return SMBusAdapter.Adapter;
         }
 
@@ -63,13 +75,18 @@ namespace ParamerusStudio.PMBus
         public static List<ParamerusPMBusDevice> PMBusInit()
         {
             var opts = new PMBusDevice.DiscoverOptions();
-            opts.Scan_Mode = PMBusDevice.ScanMode.DeviceID;
+            opts.Scan_Mode = PMBusDevice.ScanMode.DeviceCode;
             if (PMBusDevice.Discover(opts) == 0)
             {
-                opts.Scan_Mode = PMBusDevice.ScanMode.TPS53951;
+
+                opts.Scan_Mode = PMBusDevice.ScanMode.DeviceID;
                 if (PMBusDevice.Discover(opts) == 0)
-                    return null;
-            }
+                {
+                    opts.Scan_Mode = PMBusDevice.ScanMode.TPS53951;
+                    if (PMBusDevice.Discover(opts) == 0)
+                        return null;
+                }
+        }
             List<ParamerusPMBusDevice> listDevices = new List<ParamerusPMBusDevice>();
             foreach(var dev in PMBusDevice.Devices)
             {
@@ -80,7 +97,9 @@ namespace ParamerusStudio.PMBus
         }
         #endregion
 
-
+        #region Properties
+        private Timer timerUpdate;
+        private Task updateTask = null;
         #region Status registers
         private ParamerusRegisterStatus _status_VOUT;
         private ParamerusRegisterStatus _status_IOUT;
@@ -178,6 +197,81 @@ namespace ParamerusStudio.PMBus
 
         #endregion
 
+        #region Input vals
+        private double? _read_vin = 0.0;
+        private double? _read_vout = 0.0;
+        private double? _read_iout = 0.0;
+        private double? _read_pout = 0.0;
+        private double? _read_temp_int = 0.0;
+        private double? _read_temp_ext = 0.0;
+        private double? _freq = 0.0;
+
+        public double? Read_vin
+        {
+            get => _read_vin;
+            set
+            {
+                _read_vin = value;
+                OnPropertyChanged();
+            }
+        }
+        public double? Read_vout
+        {
+            get => _read_vout;
+            set
+            {
+                _read_vout = value;
+                OnPropertyChanged();
+            }
+        }
+        public double? Read_iout
+        {
+            get => _read_iout;
+            set
+            {
+                _read_iout = value;
+                OnPropertyChanged();
+            }
+        }
+        public double? Read_pout
+        {
+            get => _read_pout;
+            set
+            {
+                _read_vin = value;
+                OnPropertyChanged();
+            }
+        }
+        public double? Read_temp_int
+        {
+            get => _read_temp_int;
+            set
+            {
+                _read_temp_int = value;
+                OnPropertyChanged();
+            }
+        }
+        public double? Read_temp_ext
+        {
+            get => _read_temp_ext;
+            set
+            {
+                _read_temp_ext = value;
+                OnPropertyChanged();
+            }
+        }
+        public double? Freq
+        {
+            get => _freq;
+            set
+            {
+                _freq = value;
+                OnPropertyChanged();
+            }
+        }
+        #endregion
+
+        #region Control line properties
         private LogicLevelResult _control_line;
         public LogicLevelResult ControlLine
         {
@@ -186,10 +280,15 @@ namespace ParamerusStudio.PMBus
             {
                     _control_line = value;
                     OnPropertyChanged();
-                
             }
         }
+        //public LogicLevelResult ControlLineStat
+        //{
 
+        //}
+        #endregion
+
+        #region Device property
         private PMBusDevice _device;
         public PMBusDevice Device
         {
@@ -200,33 +299,10 @@ namespace ParamerusStudio.PMBus
                 OnPropertyChanged();
             }
         }
+        #endregion
+        #endregion
 
-        public ParamerusPMBusDevice(PMBusDevice device)
-        {
-            if (device == null)
-                throw new ArgumentNullException(nameof(device), "Device cannot be null");
-            Device = device;
-            InitRegs();
-            
-        }
-
-        /// <summary>
-        /// Обновление параметров устройства
-        /// </summary>
-        public void Update()
-        {
-            ControlLineStatus();
-            var stat_vout = Device.SMBus_Read_Byte((byte)PMBusCode.STATUS_VOUT);
-            var stat_iout = Device.SMBus_Read_Byte((byte)PMBusCode.STATUS_IOUT);
-            var stat_temp = Device.SMBus_Read_Byte((byte)PMBusCode.STATUS_TEMP);
-            var stat_cml = Device.SMBus_Read_Byte((byte)PMBusCode.STATUS_CML);
-            var stat_input = Device.SMBus_Read_Byte((byte)PMBusCode.STATUS_INPUT);
-            var stat_fans_1_2 = Device.SMBus_Read_Byte((byte)PMBusCode.STATUS_FANS_1_2);
-            var stat_fans_3_4 = Device.SMBus_Read_Byte((byte)PMBusCode.STATUS_FANS_3_4);
-            var stat_mfr_specific = Device.SMBus_Read_Byte((byte)PMBusCode.STATUS_MFR_SPECIFIC);
-            var stat_other = Device.SMBus_Read_Byte((byte)PMBusCode.STATUS_OTHER);
-        }
-
+        #region Init methods
         /// <summary>
         /// Инициализация регистров
         /// </summary>
@@ -317,7 +393,7 @@ namespace ParamerusStudio.PMBus
             Status_Fans_3_4 = new ParamerusRegisterStatus(list_Status_Fans_3_4);
             #endregion
             #region Status_Mfr_Specific
-            List<ParamerusRegisterBit> list_Status_Mfr_Specific= new List<ParamerusRegisterBit>();
+            List<ParamerusRegisterBit> list_Status_Mfr_Specific = new List<ParamerusRegisterBit>();
             list_Status_Mfr_Specific.Add(new ParamerusRegisterBit("Manufacturer 0", list_Status_Mfr_Specific.Count, BitStatus.Fault));
             list_Status_Mfr_Specific.Add(new ParamerusRegisterBit("Manufacturer 1", list_Status_Mfr_Specific.Count, BitStatus.Fault));
             list_Status_Mfr_Specific.Add(new ParamerusRegisterBit("Manufacturer 2", list_Status_Mfr_Specific.Count, BitStatus.Fault));
@@ -341,8 +417,78 @@ namespace ParamerusStudio.PMBus
             Status_Other = new ParamerusRegisterStatus(list_Status_Other);
             #endregion
         }
+        public ParamerusPMBusDevice(PMBusDevice device)
+        {
+            if (device == null)
+                throw new ArgumentNullException(nameof(device), "Device cannot be null");
+            Device = device;
+            InitRegs();
+            
+        }
+        #endregion
 
+        #region Update methods
+        private void UpdateRegister(ParamerusRegisterStatus register, PMBusCode cmd)
+        {
+            if (register.StatusRegister != BitStatus.BitNotImplemented)
+            {
+                var reg_val = Device.SMBus_Read_Byte((byte)cmd);
+                if (reg_val.SAA_Status == SAAStatus.Success)
+                    register.RegisterValue = reg_val.Byte;
+                else
+                    register.StatusRegister = BitStatus.BitNotImplemented;
+            }
+        }
 
+        private void UpdateReadValue(ref double? read_val,PMBusCode cmd)
+        {
+            
+        }
+
+        private void UpdateStatusRegisters()
+        {
+            UpdateRegister(Status_VOUT, PMBusCode.STATUS_VOUT);
+            UpdateRegister(Status_IOUT, PMBusCode.STATUS_IOUT);
+            UpdateRegister(Status_TEMP, PMBusCode.STATUS_TEMP);
+            UpdateRegister(Status_CML, PMBusCode.STATUS_CML);
+            UpdateRegister(Status_INPUT, PMBusCode.STATUS_INPUT);
+            UpdateRegister(Status_Fans_1_2, PMBusCode.STATUS_FANS_1_2);
+            UpdateRegister(Status_Fans_3_4, PMBusCode.STATUS_FANS_3_4);
+            UpdateRegister(Status_Mfr_Specific, PMBusCode.STATUS_MFR_SPECIFIC);
+            UpdateRegister(Status_Other, PMBusCode.STATUS_OTHER);
+        }
+
+        private void UpdateReadValues()
+        {
+
+        }
+        private CancellationTokenSource stopUpdateTask;
+        private void Update()
+        {
+            while(!stopUpdateTask.IsCancellationRequested)
+            {
+                ControlLineStatus();
+                UpdateReadValues();
+                UpdateStatusRegisters();
+                Thread.Sleep(TimeSpan.FromTicks(1000));
+            }
+            
+        }
+        /// <summary>
+        /// Обновление параметров устройства
+        /// </summary>
+        public void StartListener()
+        {
+            stopUpdateTask = new CancellationTokenSource();
+            updateTask = Task.Factory.StartNew(new Action(Update));
+        }
+
+        public void StopListener()
+        {
+            stopUpdateTask?.Cancel();
+            updateTask?.Wait();
+        }
+        #endregion
 
         #region Control line methods
         /// <summary>
@@ -358,7 +504,6 @@ namespace ParamerusStudio.PMBus
                 return false;
             if (control_status.Level == LogicLevel.Low)
                 Device.Adapter.Set_Control(LogicLevel.High);
-            Update();
             return true;
         }
         /// <summary>
@@ -374,7 +519,6 @@ namespace ParamerusStudio.PMBus
                 return false;
             if (control_status.Level == LogicLevel.High)
                 Device.Adapter.Set_Control(LogicLevel.Low);
-            Update();
             return true;
         }
         /// <summary>
@@ -388,31 +532,9 @@ namespace ParamerusStudio.PMBus
             ControlLine = Device.Adapter.Get_Control();
             return ControlLine;
         }
-        #endregion
+#endregion
 
-        public void OutListParamDevs()
-        {
-            Debug.WriteLine("ID\tCode\tRail\tRead Only?\tStatus\tDecoded\tDecoded Formated\tEncoded");
-
-            foreach (ParameterBase param in Device.Commands.Parameters)
-            {
-
-                if (param.Is_Meta_Command)
-                    continue;
-
-                if (!param.Show_To_User || !param.Phase_Available() || param.Is_Write_Only)
-                    continue;
-
-                param.Refresh();
-
-
-                Debug.WriteLine(StringUtils.Join("\t", param.ID, param.Code, param.Page.Number,
-                    (param.Is_Read_Only_Parameter) ? "Yes" : "No",
-                    PMBusUtils.ACK_NACK(param.Last_Status), // "ACK" or "NACK"
-                    param.oLatest_No_Immediate, param.Latest_No_Immediate_Formatted,
-                    param.oLatest_Encoded_No_Immediate));
-            }
-        }
+        #region Release INotifyPropertyChanged and override ToString()
         public override string ToString()
         {
             if (Device == null)
@@ -424,6 +546,7 @@ namespace ParamerusStudio.PMBus
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
+        #endregion
     }
 
 

@@ -105,6 +105,10 @@
                 <Setter Property="Background" Value="{StaticResource Paramerus.RegisterBitWarningColor}"/>
                 <Setter Property="Foreground" Value="Black"/>
             </DataTrigger>
+            <DataTrigger Binding="{Binding Path=CurrentStatusBit}" Value="BitNotImplemented">
+                <Setter Property="Background" Value="{StaticResource Button.Disabled.Background}"/>
+                <Setter Property="Foreground" Value="{StaticResource Button.Disabled.Foreground}"/>
+            </DataTrigger>
         </Style.Triggers>
     </Style>
 

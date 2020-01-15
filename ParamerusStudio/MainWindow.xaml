@@ -411,13 +411,14 @@
                                                           Margin="0,0,0,4"/>
                                     </Grid>
                                 </dxlc:GroupBox>
-                                
+
                             </dxlc:LayoutControl>
                             <component:ParamerusIndicButton Height="40"
                                                             DataContext="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
                                                             VerticalAlignment="Bottom"
                                                             HorizontalAlignment="Stretch"
                                                             HorizontalContentAlignment="Left"
+                                                            CurrentStateIndex="{Binding Converter={StaticResource StatusControlLineConv},FallbackValue=0}"
                                                             DockPanel.Dock="Bottom"
                                                             VerticalContentAlignment="Center"
                                                             HorizontalIndicatorAlignment="Right"
@@ -426,13 +427,13 @@
                                                             MarginIndicator="0,0,20,0"
                                                             IndicatorHeight="15"
                                                             IndicatorWidth="15"
-                                                            CurrentStateIndex="{Binding Converter={StaticResource StatusControlLineConv},FallbackValue=0}"
                                                             StateIndexChanged="ParamerusIndicButton_StateIndexChanged"
                                                             Background="{StaticResource Paramerus.HeaderBackground}">
                                 <component:ParamerusIndicButton.IndicatorBackground>
+                                    
                                     <MultiBinding Converter="{StaticResource StatRegToIndBackgroundConv}">
                                         <Binding />
-                                        <Binding Path="ControlLine"/>
+                                        <Binding Path="ControlLine" IsAsync="True"/>
                                         <Binding Path="Status_VOUT.StatusRegister"/>
                                         <Binding Path="Status_IOUT.StatusRegister"/>
                                         <Binding Path="Status_TEMP.StatusRegister"/>
@@ -463,13 +464,13 @@
                             Height="Auto" HorizontalAlignment="Right"
                             Padding="0">
                             <dxlc:FlowLayoutControl DockPanel.Dock="Left" 
-                                                        Orientation="Vertical"
-                                                        HorizontalAlignment="Stretch"
-                                                        StretchContent="True"
-                                                        MaximizedElementPosition="Right"
-                                                        Width="205"
-                                                        ScrollBars="None"
-                                                        Padding="0,5,0,0" >
+                                                    Orientation="Vertical"
+                                                    HorizontalAlignment="Stretch"
+                                                    StretchContent="True"
+                                                    MaximizedElementPosition="Right"
+                                                    Width="205"
+                                                    ScrollBars="None"
+                                                    Padding="0,5,0,0" >
                                 
                                 <dxlc:GroupBox Style="{StaticResource ParamerusRegisterStatusGroupBoxStylle}"
                                                DataContext="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Status_VOUT}"
@@ -483,17 +484,18 @@
                                               Style="{StaticResource ParamerusRegisterStatusDataGridStyle}">
                                         <DataGrid.ItemsSource>
                                             <MultiBinding Converter="{StaticResource RegStatusTableConverter}">
-                                                <Binding ElementName="mainWindow" Path="CurrentPmBusDevice"/>
+                                                <Binding/>
                                                 <Binding Path="Status_VOUT"/>
                                             </MultiBinding>
                                         </DataGrid.ItemsSource>
                                         <DataGrid.Columns>
-                                                <DataGridTextColumn Binding="{Binding Path=BitNum}"
+                                            <DataGridTextColumn Binding="{Binding Path=BitNum}"
                                                                     Width="Auto"/>
-                                                <DataGridTextColumn Binding="{Binding Path=NameBit}"
+                                            <DataGridTextColumn Binding="{Binding Path=NameBit}"
                                                                     Width="*"/>
-                                            </DataGrid.Columns>
-                                        </DataGrid>
+                                        </DataGrid.Columns>
+                                        
+                                    </DataGrid>
 
                                     </dxlc:GroupBox>
                                 <dxlc:GroupBox Style="{StaticResource ParamerusRegisterStatusGroupBoxStylle}"

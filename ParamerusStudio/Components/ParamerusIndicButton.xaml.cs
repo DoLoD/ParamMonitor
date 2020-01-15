@@ -167,6 +167,7 @@ namespace ParamerusStudio.Components
                 SetValue(IndicatorHeightProperty, value);
             }
         }
+        object locker = new object();
         public int CurrentStateIndex
         {
             get
@@ -175,8 +176,12 @@ namespace ParamerusStudio.Components
             }
             set
             {
-                SetValue(CurrentStateIndexProperty, value);
-                OnPropertyChanged();
+                lock(locker)
+                {
+                    SetValue(CurrentStateIndexProperty, value);
+                    OnPropertyChanged();
+                }
+                
             }
         }
         public List<String> StatesButton

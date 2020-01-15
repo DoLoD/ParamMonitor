@@ -46,7 +46,7 @@ namespace ParamerusStudio
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            return (object[])Binding.DoNothing;
         }
     }
     /// <summary>
@@ -80,7 +80,7 @@ namespace ParamerusStudio
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            if(values.Contains(null) || values.Contains(Binding.DoNothing))
+            if(values.Contains(null) || values.Contains(DependencyProperty.UnsetValue))
                 return Brushes.Red;
 
             LogicLevelResult res = values[1] as LogicLevelResult;
@@ -148,7 +148,7 @@ namespace ParamerusStudio
             set
             {
                 _сurrentPmBusDevice = value;
-                Dispatcher.Invoke(()=> _сurrentPmBusDevice.Update());
+                _сurrentPmBusDevice.StartListener();
                 OnPropertyChanged();
             }
         }
@@ -223,8 +223,9 @@ namespace ParamerusStudio
             cbDeviceList.Dispatcher.Invoke(() =>
             {
                 cbDeviceList.SelectedIndex = 0;
+                CurrentPmBusDevice = PMBusDevices[0];
             });
-            CurrentPmBusDevice = PMBusDevices[0];
+            
             SetStatus("PMBus-devices found!");
         }
 
@@ -239,6 +240,7 @@ namespace ParamerusStudio
                 return;
             if (cbDeviceList.SelectedIndex == -1)
                 cbDeviceList.SelectedIndex = 0;
+            CurrentPmBusDevice?.StopListener();
             CurrentPmBusDevice = PMBusDevices[cbDeviceList.SelectedIndex];
         }
         public event PropertyChangedEventHandler PropertyChanged;
