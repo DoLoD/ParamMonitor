@@ -29,3 +29,18 @@ dotnet_diagnostic.CA1812.severity = none
 
 # CA1062: Проверить аргументы или открытые методы
 dotnet_diagnostic.CA1062.severity = none
+
+# CA1801: Параметр oldState метода ParamerusIndicButton_StateIndexChanged не используется. Удалите этот параметр или используйте его в теле метода.
+dotnet_diagnostic.CA1801.severity = none
+
+# CA1051: Не объявляйте видимые поля экземпляров
+dotnet_diagnostic.CA1051.severity = none
+
+# CS0618: Тип или член устарел
+dotnet_diagnostic.CS0618.severity = none
+
+# CA1825: Старайтесь не выделять массивы нулевой длины.
+dotnet_diagnostic.CA1825.severity = none
+
+# CA1001: Типы, владеющие высвобождаемыми полями, должны быть высвобождаемыми
+dotnet_diagnostic.CA1001.severity = none

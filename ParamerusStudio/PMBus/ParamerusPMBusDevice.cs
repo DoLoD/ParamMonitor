@@ -1,4 +1,5 @@
-﻿using ParamerusStudio.VirtualDevice;
+﻿using ParamerusStudio.PMBus.Commands;
+using ParamerusStudio.VirtualDevice;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,9 +16,18 @@ using TIDP.SAA;
 
 namespace ParamerusStudio.PMBus
 {
+    public enum PMBusMode
+    {
+        Linear = 0x0,
+        VID = 0x1,
+        Direct = 0x2
+    }
     public enum PMBusCode
     {
+        VOUT_MODE = 0x20,
         VOUT_COMMAND = 0x21,
+        VOUT_TRIM = 0x22,
+        VOUT_CAL_OFFSET = 0x23,
         STATUS_BYTE = 0x78,
         STATUS_WORD = 0x79,
         STATUS_VOUT = 0x7A,
@@ -199,9 +209,9 @@ namespace ParamerusStudio.PMBus
 
         #region Input vals
         private double? _read_vin = 0.0;
+        private double? _read_iin = 0.0;
         private double? _read_vout = 0.0;
         private double? _read_iout = 0.0;
-        private double? _read_pout = 0.0;
         private double? _read_temp_int = 0.0;
         private double? _read_temp_ext = 0.0;
         private double? _freq = 0.0;
@@ -211,7 +221,20 @@ namespace ParamerusStudio.PMBus
             get => _read_vin;
             set
             {
+                if (_read_vin == value)
+                    return;
                 _read_vin = value;
+                OnPropertyChanged();
+            }
+        }
+        public double? Read_iin
+        {
+            get => _read_iin;
+            set
+            {
+                if (_read_iin == value)
+                    return;
+                _read_iin = value;
                 OnPropertyChanged();
             }
         }
@@ -220,6 +243,8 @@ namespace ParamerusStudio.PMBus
             get => _read_vout;
             set
             {
+                if (_read_vout == value)
+                    return;
                 _read_vout = value;
                 OnPropertyChanged();
             }
@@ -229,16 +254,9 @@ namespace ParamerusStudio.PMBus
             get => _read_iout;
             set
             {
+                if (_read_iout == value)
+                    return;
                 _read_iout = value;
-                OnPropertyChanged();
-            }
-        }
-        public double? Read_pout
-        {
-            get => _read_pout;
-            set
-            {
-                _read_vin = value;
                 OnPropertyChanged();
             }
         }
@@ -247,6 +265,8 @@ namespace ParamerusStudio.PMBus
             get => _read_temp_int;
             set
             {
+                if (_read_temp_int == value)
+                    return;
                 _read_temp_int = value;
                 OnPropertyChanged();
             }
@@ -256,21 +276,26 @@ namespace ParamerusStudio.PMBus
             get => _read_temp_ext;
             set
             {
+                if (_read_temp_ext == value)
+                    return;
                 _read_temp_ext = value;
                 OnPropertyChanged();
             }
         }
-        public double? Freq
+        public double? Read_freq
         {
             get => _freq;
             set
             {
+                if (_freq == value)
+                    return;
                 _freq = value;
                 OnPropertyChanged();
             }
         }
         #endregion
 
+        private List<PMBusReadCommand> read_commands;
         #region Control line properties
         private LogicLevelResult _control_line;
         public LogicLevelResult ControlLine
@@ -282,10 +307,7 @@ namespace ParamerusStudio.PMBus
                     OnPropertyChanged();
             }
         }
-        //public LogicLevelResult ControlLineStat
-        //{
 
-        //}
         #endregion
 
         #region Device property
@@ -417,13 +439,34 @@ namespace ParamerusStudio.PMBus
             Status_Other = new ParamerusRegisterStatus(list_Status_Other);
             #endregion
         }
+        private void InitReadCommands()
+        {
+            read_commands = new List<PMBusReadCommand>();
+            read_commands.Add(new ReadVoutCommand(this.Device, ((e) => Read_vout = (double?)e),
+                                                              (() => Read_vout != null)));
+            read_commands.Add(new ReadIoutCommand(this.Device, ((e) => Read_iout = (double?)e),
+                                                              (() => Read_iout != null)));
+            read_commands.Add(new ReadVinCommand(this.Device, ((e) => Read_vin = (double?)e),
+                                                              (() => Read_vin != null)));
+            read_commands.Add(new ReadIinCommand(this.Device, ((e) => Read_iin = (double?)e),
+                                                              (() => Read_iin != null)));
+            read_commands.Add(new ReadTemp1Command(this.Device, ((e) => Read_temp_int = (double?)e),
+                                                              (() => Read_temp_int != null)));
+            read_commands.Add(new ReadTemp2Command(this.Device, ((e) => Read_temp_ext = (double?)e),
+                                                              (() => Read_temp_ext != null)));
+            read_commands.Add(new ReadFreqCommand(this.Device, ((e) => Read_freq = (double?)e),
+                                                              (() => Read_freq != null)));
+        }
+
         public ParamerusPMBusDevice(PMBusDevice device)
         {
             if (device == null)
                 throw new ArgumentNullException(nameof(device), "Device cannot be null");
             Device = device;
             InitRegs();
-            
+            InitReadCommands();
+
+
         }
         #endregion
 
@@ -440,10 +483,7 @@ namespace ParamerusStudio.PMBus
             }
         }
 
-        private void UpdateReadValue(ref double? read_val,PMBusCode cmd)
-        {
-            
-        }
+        
 
         private void UpdateStatusRegisters()
         {
@@ -458,16 +498,23 @@ namespace ParamerusStudio.PMBus
             UpdateRegister(Status_Other, PMBusCode.STATUS_OTHER);
         }
 
+
         private void UpdateReadValues()
         {
-
+            if(read_commands != null && read_commands.Count != 0)
+            {
+                foreach(PMBusReadCommand cmd in read_commands)
+                {
+                    object res = cmd.ReadCmd();
+                }
+            }
         }
         private CancellationTokenSource stopUpdateTask;
         private void Update()
         {
             while(!stopUpdateTask.IsCancellationRequested)
             {
-                ControlLineStatus();
+                ControlLineStatusUpdate();
                 UpdateReadValues();
                 UpdateStatusRegisters();
                 Thread.Sleep(TimeSpan.FromTicks(1000));
@@ -499,7 +546,7 @@ namespace ParamerusStudio.PMBus
         {
             if (Device == null)
                 return false;
-            LogicLevelResult control_status = ControlLineStatus();
+            LogicLevelResult control_status = ControlLineStatusUpdate();
             if (!control_status.Success)
                 return false;
             if (control_status.Level == LogicLevel.Low)
@@ -514,7 +561,7 @@ namespace ParamerusStudio.PMBus
         {
             if (Device == null)
                 return false;
-            LogicLevelResult control_status = ControlLineStatus();
+            LogicLevelResult control_status = ControlLineStatusUpdate();
             if (!control_status.Success)
                 return false;
             if (control_status.Level == LogicLevel.High)
@@ -525,7 +572,7 @@ namespace ParamerusStudio.PMBus
         /// Получение состояния контрольной линии, запрашивает состояние линии у устройства, и обновляет свойство ControlLine
         /// </summary>
         /// <returns></returns>
-        public LogicLevelResult ControlLineStatus()
+        public LogicLevelResult ControlLineStatusUpdate()
         {
             if (Device == null)
                 return null;

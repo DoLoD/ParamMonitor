@@ -31,6 +31,7 @@ using TIDP;
 namespace ParamerusStudio
 {
     #region Converters
+
     /// <summary>
     /// Конвертер значений, преобразовывающий регистр статуса в коллекцию бит
     /// </summary>
@@ -52,14 +53,18 @@ namespace ParamerusStudio
     /// <summary>
     /// Конвертер значений, преобразовывающий состояние контрольной линии, в состояние индикаторной кнопки
     /// </summary>
-    public class StatusControlLineToStateIndicButtonConverter : IValueConverter
+    public class StatusControlLineToStateIndicButtonConverter : IMultiValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value == null || !(value is ParamerusPMBusDevice))
+            if (values == null || values.Contains(null) || values.Contains(DependencyProperty.UnsetValue))
                 return 0;
-            ParamerusPMBusDevice dev = value as ParamerusPMBusDevice;
-            LogicLevelResult stat_control_line = dev.ControlLineStatus();
+            if (!(values[0] is ParamerusPMBusDevice) || !(values[1] is LogicLevelResult))
+                return 0;
+
+            ParamerusPMBusDevice dev = values[0] as ParamerusPMBusDevice;
+            LogicLevelResult stat_control_line = dev.ControlLine;
             if (!stat_control_line.Success)
                 return 0;
             if (stat_control_line.Level == LogicLevel.Low)
@@ -68,9 +73,9 @@ namespace ParamerusStudio
                 return 1;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
-            return Binding.DoNothing;
+            return (object[])Binding.DoNothing;
         }
     }
     /// <summary>
@@ -157,6 +162,7 @@ namespace ParamerusStudio
         public MainWindow()
         {
             InitializeComponent();
+            DXGridDataController.DisableThreadingProblemsDetection = true;
         }
 
 
@@ -168,6 +174,7 @@ namespace ParamerusStudio
         private void Image_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             this.DragMove();
+            
         }
 
         /// <summary>

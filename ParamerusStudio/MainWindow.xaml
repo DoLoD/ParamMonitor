@@ -33,7 +33,11 @@
     WindowStyle="SingleBorderWindow"
     Padding="0" Loaded="DXWindow_Loaded" WindowState="Maximized">
 
-
+    <Window.Resources>
+        <ResourceDictionary Source="/ParamerusStudio;component/Components/ComponentStyles.xaml" />
+        
+    </Window.Resources>
+    
     <dxc:DXWindow.HeaderItems>
         <StackPanel Orientation="Horizontal">
             <Grid>
@@ -72,9 +76,7 @@
         </StackPanel>
     </dxc:DXWindow.HeaderItems>
 
-    <Window.Resources>
-        <ResourceDictionary Source="/ParamerusStudio;component/Components/ComponentStyles.xaml" />
-    </Window.Resources>
+
 
     <DockPanel>
         <Border BorderThickness="0,2,0,2" 
@@ -248,10 +250,11 @@
                                                         Grid.Row="0" 
                                                         Grid.Column="0"
                                                         Margin="0,0,4,4"/>
-                                        <dxe:SpinEdit Grid.Row="0"
-                                                          Margin="0,0,0,4"
-                                                          Grid.Column="1" 
-                                                          HorizontalContentAlignment="Center"/>
+                                        <dxe:SpinEdit x:Name="PeriodReadingCharts" Grid.Row="0"
+                                                      Value="500"
+                                                      Margin="0,0,0,4"
+                                                      Grid.Column="1" 
+                                                      HorizontalContentAlignment="Center"/>
                                         <TextBlock Text="Plot Range:"
                                                        HorizontalAlignment="Right"
                                                        Grid.Row="1" 
@@ -413,12 +416,13 @@
                                 </dxlc:GroupBox>
 
                             </dxlc:LayoutControl>
+                            
                             <component:ParamerusIndicButton Height="40"
                                                             DataContext="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
                                                             VerticalAlignment="Bottom"
                                                             HorizontalAlignment="Stretch"
                                                             HorizontalContentAlignment="Left"
-                                                            CurrentStateIndex="{Binding Converter={StaticResource StatusControlLineConv},FallbackValue=0}"
+                                                            
                                                             DockPanel.Dock="Bottom"
                                                             VerticalContentAlignment="Center"
                                                             HorizontalIndicatorAlignment="Right"
@@ -429,11 +433,16 @@
                                                             IndicatorWidth="15"
                                                             StateIndexChanged="ParamerusIndicButton_StateIndexChanged"
                                                             Background="{StaticResource Paramerus.HeaderBackground}">
+                                <component:ParamerusIndicButton.CurrentStateIndex>
+                                    <MultiBinding Converter="{StaticResource StatusControlLineConv}" FallbackValue="0">
+                                        <Binding/>
+                                        <Binding Path="ControlLine"/>
+                                    </MultiBinding>
+                                </component:ParamerusIndicButton.CurrentStateIndex>
                                 <component:ParamerusIndicButton.IndicatorBackground>
-                                    
                                     <MultiBinding Converter="{StaticResource StatRegToIndBackgroundConv}">
                                         <Binding />
-                                        <Binding Path="ControlLine" IsAsync="True"/>
+                                        <Binding Path="ControlLine"/>
                                         <Binding Path="Status_VOUT.StatusRegister"/>
                                         <Binding Path="Status_IOUT.StatusRegister"/>
                                         <Binding Path="Status_TEMP.StatusRegister"/>
@@ -720,37 +729,59 @@
                                      Rows="4"
                                      Height="1153">
                                 <local:ParamerusChartPanel x:Name="VinChartPanel"
-                                                       Style="{StaticResource ParamerusChartPanelCustomStyle}"
-                                                       VisibleLimitsPanel="{Binding ElementName=cbShowWarningFaultLimits, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                                       NamePanel="Vin - Input Voltage"/>
+                                                           LastValue="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_vin}"
+                                                           Device="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
+                                                           TimerPeriod="{Binding ElementName=PeriodReadingCharts, Path=Value}"
+                                                           Style="{StaticResource ParamerusChartPanelCustomStyle}"
+                                                           VisibleLimitsPanel="{Binding ElementName=cbShowWarningFaultLimits, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                           NamePanel="Vin - Input Voltage"/>
                                 <local:ParamerusChartPanel x:Name="VoutChartPanel"
+                                                           LastValue="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_vout}"
+                                                           Device="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
+                                                           TimerPeriod="{Binding ElementName=PeriodReadingCharts, Path=Value}"
                                                            VisibleLimitsPanel="{Binding ElementName=cbShowWarningFaultLimits, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                                       Style="{StaticResource ParamerusChartPanelCustomStyle}"
-                                                       NamePanel="Vout - Output Voltage"/>
+                                                           Style="{StaticResource ParamerusChartPanelCustomStyle}"
+                                                           NamePanel="Vout - Output Voltage"/>
                                 <local:ParamerusChartPanel x:Name="IoutChartPanel" 
+                                                           LastValue="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_iout}"
+                                                           Device="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
+                                                           TimerPeriod="{Binding ElementName=PeriodReadingCharts, Path=Value}"
                                                            VisibleLimitsPanel="{Binding ElementName=cbShowWarningFaultLimits, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                                       Style="{StaticResource ParamerusChartPanelCustomStyle}"
-                                                       NamePanel="Iout - Output Current"/>
+                                                           Style="{StaticResource ParamerusChartPanelCustomStyle}"
+                                                           NamePanel="Iout - Output Current"/>
                                 <local:ParamerusChartPanel x:Name="PoutChartPanel"  
+                                                           Device="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
+                                                           TimerPeriod="{Binding ElementName=PeriodReadingCharts, Path=Value}"
                                                            VisibleLimitsPanel="{Binding ElementName=cbShowWarningFaultLimits, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                                       Style="{StaticResource ParamerusChartPanelCustomStyle}"
-                                                       NamePanel="Pout(calc) - Output Power"/>
+                                                           Style="{StaticResource ParamerusChartPanelCustomStyle}"
+                                                           NamePanel="Pout(calc) - Output Power"/>
                                 <local:ParamerusChartPanel x:Name="IntTempChartPanel" 
+                                                           LastValue="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_temp_int}"
+                                                           Device="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
+                                                           TimerPeriod="{Binding ElementName=PeriodReadingCharts, Path=Value}"
                                                            VisibleLimitsPanel="{Binding ElementName=cbShowWarningFaultLimits, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                                       Style="{StaticResource ParamerusChartPanelCustomStyle}"
-                                                       NamePanel="Temp Int - Temperature Internal"/>
+                                                           Style="{StaticResource ParamerusChartPanelCustomStyle}"
+                                                           NamePanel="Temp Int - Temperature Internal"/>
                                 <local:ParamerusChartPanel x:Name="ExtTempChartPanel" 
+                                                           LastValue="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_temp_ext}"
+                                                           Device="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
+                                                           TimerPeriod="{Binding ElementName=PeriodReadingCharts, Path=Value}"
                                                            VisibleLimitsPanel="{Binding ElementName=cbShowWarningFaultLimits, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                                       Style="{StaticResource ParamerusChartPanelCustomStyle}"
-                                                       NamePanel="Temp Ext - Temperature External"/>
+                                                           Style="{StaticResource ParamerusChartPanelCustomStyle}"
+                                                           NamePanel="Temp Ext - Temperature External"/>
                                 <local:ParamerusChartPanel x:Name="AllTempChartPanel" 
+                                                           Device="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
+                                                           TimerPeriod="{Binding ElementName=PeriodReadingCharts, Path=Value}"
                                                            VisibleLimitsPanel="{Binding ElementName=cbShowWarningFaultLimits, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                                       Style="{StaticResource ParamerusChartPanelCustomStyle}"
-                                                       NamePanel="All Temp - All Temperatures"/>
+                                                           Style="{StaticResource ParamerusChartPanelCustomStyle}"
+                                                           NamePanel="All Temp - All Temperatures"/>
                                 <local:ParamerusChartPanel x:Name="FreqChartPanel" 
+                                                           LastValue="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_freq}"
+                                                           Device="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
+                                                           TimerPeriod="{Binding ElementName=PeriodReadingCharts, Path=Value}"
                                                            VisibleLimitsPanel="{Binding ElementName=cbShowWarningFaultLimits, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                                       Style="{StaticResource ParamerusChartPanelCustomStyle}"
-                                                       NamePanel="Freq - Frequency"/>
+                                                           Style="{StaticResource ParamerusChartPanelCustomStyle}"
+                                                           NamePanel="Freq - Frequency"/>
                             </UniformGrid>
                         </dxlc:LayoutControl>
                     </Border>

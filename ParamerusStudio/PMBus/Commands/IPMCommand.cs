@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TIDP.PMBus;
 
-namespace MaterialSkinDemo.PMBus.Commands
+namespace ParamerusStudio.PMBus.Commands
 {
-    public interface IPMCommand
+    public interface IPMBusReadCommand
     {
-        void Execute(object val);
         object ReadCmd();
-
     }
 }

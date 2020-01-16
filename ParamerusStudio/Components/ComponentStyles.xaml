@@ -8,7 +8,6 @@
                     xmlns:dxwui="http://schemas.devexpress.com/winfx/2008/xaml/windowsui"
                     xmlns:components="clr-namespace:ParamerusStudio.Components"
                     xmlns:pmbus="clr-namespace:ParamerusStudio.PMBus">
-
     <SolidColorBrush x:Key="Paramerus.MainColor" Color="#FFC20000"/>
     <SolidColorBrush x:Key="Paramerus.HeaderSplitter" Color="#FFAEAEAE"/>
     <SolidColorBrush x:Key="Paramerus.HeaderButtonBorder" Color="#FF6B7288"/>
@@ -35,6 +34,7 @@
     <local:StatusControlLineToStateIndicButtonConverter x:Key="StatusControlLineConv"/>
     <local:StatusRegsToIndicatorButtonBacgroundConverter x:Key="StatRegToIndBackgroundConv"/>
 
+    
     <Style x:Key="ToggleButtonMenuStyle" BasedOn="{StaticResource {x:Type ToggleButton}}" TargetType="RadioButton">
         <Setter Property="Width" Value="100"/>
         <Setter Property="BorderBrush" Value="Transparent"/>

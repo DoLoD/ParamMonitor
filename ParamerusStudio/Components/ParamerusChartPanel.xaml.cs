@@ -38,6 +38,8 @@ namespace ParamerusStudio
     /// </summary>
     public partial class ParamerusChartPanel : UserControl, INotifyPropertyChanged
     {
+        
+
         public static readonly DependencyProperty VisibleLimitsPanelProperty = DependencyProperty.RegisterAttached("VisibleLimitsPanel",
                                                                                                                     typeof(bool?),
                                                                                                                     typeof(ParamerusChartPanel),
@@ -45,9 +47,15 @@ namespace ParamerusStudio
                                                                                                                         false,
                                                                                                                         FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
                                                                                                                         (o,args) => ((ParamerusChartPanel)o).SetVisibleLimitsPanel((bool)args.NewValue)));
-
-        public static readonly DependencyProperty DeviceProperty = DependencyProperty.Register("Device", typeof(ParamerusPMBusDevice), typeof(ParamerusChartPanel));
+        public static readonly DependencyProperty LastValueProperty = DependencyProperty.Register("LastValue", typeof(double?), typeof(ParamerusChartPanel));
+        
+        public static readonly DependencyProperty DeviceProperty = DependencyProperty.Register("Device", typeof(ParamerusPMBusDevice), typeof(ParamerusChartPanel),
+                                                                                                                    new FrameworkPropertyMetadata(
+                                                                                                                        null,
+                                                                                                                        FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
+                                                                                                                        (o, args) => ((ParamerusChartPanel)o).CurrentDeviceChanged?.Invoke((ParamerusPMBusDevice)args.NewValue)));
         public static readonly DependencyProperty TimerPeriodProperty = DependencyProperty.Register("TimerPeriod", typeof(int), typeof(ParamerusChartPanel));
+
         public static void VisibleLimitPanelChanged(DependencyObject d, DependencyPropertyChangedEventArgs args)
         {
             if (d == null)
@@ -55,9 +63,20 @@ namespace ParamerusStudio
             (d as ParamerusChartPanel).SetVisibleLimitsPanel((bool)args.NewValue);
         }
 
+
+        public double? LastValue
+        {
+            get => (double?)GetValue(LastValueProperty);
+            set
+            {
+                SetValue(LastValueProperty, value);
+            }
+        }
+        public event Action<ParamerusPMBusDevice> CurrentDeviceChanged;
+
         public ParamerusPMBusDevice Device
         {
-            get => (ParamerusPMBusDevice)GetValue(DeviceProperty);
+            get => Dispatcher.Invoke<ParamerusPMBusDevice>(() => (ParamerusPMBusDevice)GetValue(DeviceProperty));
             set
             {
                 SetValue(DeviceProperty, value);
@@ -66,7 +85,7 @@ namespace ParamerusStudio
 
         public int TimerPeriod
         {
-            get => (int)GetValue(TimerPeriodProperty);
+            get => Dispatcher.Invoke<int>(()=>(int)GetValue(TimerPeriodProperty));
             set
             {
                 SetValue(TimerPeriodProperty, value);
@@ -75,7 +94,7 @@ namespace ParamerusStudio
         public String NamePanel { get; set; }
         private Timer timer { get; set; }
         private bool? _visible_panel;
-        private bool? _visible_limits_panel;
+        private LineGraph plot;
         public bool? VisiblePanel
         {
             get { return _visible_panel; }
@@ -97,7 +116,6 @@ namespace ParamerusStudio
                 LimitsPanel.Visibility = Visibility.Collapsed;
             else
                 LimitsPanel.Visibility = Visibility.Visible;
-            _visible_limits_panel = newValue;
             SetValue(VisibleLimitsPanelProperty, newValue);
             OnPropertyChanged("VisibleLimitsPanel");
         }
@@ -119,32 +137,39 @@ namespace ParamerusStudio
             VisiblePanel = true;
             SetVisibleLimitsPanel(false);
             HeaderCloseButton.Click += HeaderCloseButton_Click;
-
-            //double[] x = new double[200];
-            //for (int i = 0; i < x.Length; i++)
-            //    x[i] = 3.1415 * i / (x.Length - 1);
-
+            CurrentDeviceChanged += ParamerusChartPanel_CurrentDeviceChanged;
+        }
+        List<long> x;
+        List<double> y;
+        int i;
+        private void ParamerusChartPanel_CurrentDeviceChanged(ParamerusPMBusDevice obj)
+        {
+            plot = new LineGraph();
+            x = new List<long>();
+            y = new List<double>();
+            plot.Plot(x, y);
             
-            
-            //for (int i = 0; i < 8; i++)
-            //{
-            //    var lg = new LineGraph();
-            //    var lg_legend = new LineGraph();
-
-            //    lg_legend.SetBinding(LineGraph.VisibilityProperty, new Binding() {Path=new PropertyPath("Visibility"),  Source=lg, Mode=BindingMode.TwoWay});
-            //    lg_legend.Description = String.Format(CultureInfo.CurrentCulture, "Data series {0}", i + 1);
-            //    lg_legend.StrokeThickness = 2;
-            //    lg_legend.Stroke = new SolidColorBrush(Color.FromArgb(255, (byte)((i * 20) + 90), 0, 0));
-            //    lg.StrokeThickness = 2;
-            //    lg.Stroke = new SolidColorBrush(Color.FromArgb(255, (byte)((i * 20) + 90), 0, 0));
-            //    lg.Plot(x, x.Select(v => Math.Sin(v + i / 10.0)).ToArray());
-            //    lines.Children.Add(lg);
-            //    lines_legend.Items.Add(lg_legend);
-            //}
-
-            
+            lines.Children.Add(plot);
+            timer = new Timer((e) => Dispatcher.Invoke(TimerCb), null, 0, TimerPeriod);
+        }
+        
+        private void TimerCb()
+        {
+            if (LastValue != null && Visibility == Visibility.Visible)
+            {
+                if (x.Count == 0)
+                    x.Add(0);
+                else
+                    x.Add(x.Last() + TimerPeriod);
+                y.Add((double)LastValue);
+                plot.Plot(x, y);
+            }
         }
 
+        private void TimerTick(object state)
+        {
+            
+        }
 
         private void HeaderCloseButton_Click(object sender, RoutedEventArgs e)
         {
