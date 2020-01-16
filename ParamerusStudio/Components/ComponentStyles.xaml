@@ -3,10 +3,7 @@
                     xmlns:local="clr-namespace:ParamerusStudio"
                     xmlns:dxa="http://schemas.devexpress.com/winfx/2008/xaml/accordion"
                     xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
-                    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
                     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-                    xmlns:dxwui="http://schemas.devexpress.com/winfx/2008/xaml/windowsui"
-                    xmlns:components="clr-namespace:ParamerusStudio.Components"
                     xmlns:pmbus="clr-namespace:ParamerusStudio.PMBus">
     <SolidColorBrush x:Key="Paramerus.MainColor" Color="#FFC20000"/>
     <SolidColorBrush x:Key="Paramerus.HeaderSplitter" Color="#FFAEAEAE"/>

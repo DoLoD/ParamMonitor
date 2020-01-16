@@ -1,32 +1,19 @@
-﻿using DevExpress.Xpf.Accordion;
-using DevExpress.Xpf.Core;
-using DevExpress.Xpf.Editors;
-using DevExpress.Xpf.WindowsUI;
+﻿using DevExpress.Xpf.Core;
 using ParamerusStudio.Components;
 using ParamerusStudio.PMBus;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using TIDP.PMBus;
-using TIDP.PMBus.Commands;
 using TIDP.SAA;
-using TIDP;
 
 namespace ParamerusStudio
 {
@@ -300,6 +287,15 @@ namespace ParamerusStudio
                 }
 
             }
+        }
+
+        private void VinChartPanel_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (sender == null || !(sender is ParamerusChartPanel))
+                return;
+
+            ParamerusChartPanel panel = sender as ParamerusChartPanel;
+            panel.Focus();
         }
     }
     }

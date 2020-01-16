@@ -17,6 +17,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using InteractiveDataDisplay.WPF;
+using OxyPlot;
+using OxyPlot.Axes;
+using OxyPlot.Series;
 using ParamerusStudio.PMBus;
 
 namespace ParamerusStudio
@@ -83,6 +86,39 @@ namespace ParamerusStudio
             }
         }
 
+        private List<double> _values = new List<double>();
+        private List<long> _times = new List<long>();
+
+        public List<double> Values
+        {
+            get => _values;
+            set
+            {
+                _values = value;
+                OnPropertyChanged();
+            }
+        }
+        public List<long> Times
+        {
+            get => _times;
+            set
+            {
+                _times = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private PlotModel _model = new PlotModel();
+        public PlotModel MyModel
+        {
+            get => _model;
+            set
+            {
+                _model = value;
+                OnPropertyChanged();
+            }
+        }
+
         public int TimerPeriod
         {
             get => Dispatcher.Invoke<int>(()=>(int)GetValue(TimerPeriodProperty));
@@ -94,7 +130,6 @@ namespace ParamerusStudio
         public String NamePanel { get; set; }
         private Timer timer { get; set; }
         private bool? _visible_panel;
-        private LineGraph plot;
         public bool? VisiblePanel
         {
             get { return _visible_panel; }
@@ -130,7 +165,7 @@ namespace ParamerusStudio
             }
         }
 
-        
+        public LineSeries ser = new LineSeries();
         public ParamerusChartPanel()
         {
             InitializeComponent();
@@ -138,31 +173,73 @@ namespace ParamerusStudio
             SetVisibleLimitsPanel(false);
             HeaderCloseButton.Click += HeaderCloseButton_Click;
             CurrentDeviceChanged += ParamerusChartPanel_CurrentDeviceChanged;
-        }
-        List<long> x;
-        List<double> y;
-        int i;
-        private void ParamerusChartPanel_CurrentDeviceChanged(ParamerusPMBusDevice obj)
-        {
-            plot = new LineGraph();
-            x = new List<long>();
-            y = new List<double>();
-            plot.Plot(x, y);
-            
-            lines.Children.Add(plot);
-            timer = new Timer((e) => Dispatcher.Invoke(TimerCb), null, 0, TimerPeriod);
+            MyModel.Axes.Add(new LinearAxis
+            {
+                Position = AxisPosition.Left,
+                Minimum = 0.0,
+                Maximum = 0.5,
+            });
+            MyModel.Axes.Add(new LinearAxis
+            {
+                Position = AxisPosition.Bottom,
+                Minimum = 0.0,
+                Maximum = 600000.0,
+                LabelFormatter=TimeLabelFormatter
+            });
+            ser = new LineSeries() { LineStyle = LineStyle.Solid , Color = OxyColor.FromArgb(0xFF,0xC2,0x00,0x00), StrokeThickness=2};
+            MyModel.Series.Add(ser);
         }
         
-        private void TimerCb()
+        private String TimeLabelFormatter(double val)
         {
-            if (LastValue != null && Visibility == Visibility.Visible)
+            TimeSpan time = TimeSpan.FromMilliseconds(val);
+            if (time.Hours != 0)
             {
-                if (x.Count == 0)
-                    x.Add(0);
-                else
-                    x.Add(x.Last() + TimerPeriod);
-                y.Add((double)LastValue);
-                plot.Plot(x, y);
+                return time.ToString("hh\\.mm\\.ss");
+            }
+            else if (time.Minutes != 0)
+            {
+                return time.ToString("mm\\.ss");
+            }
+            else if (time.Seconds != 0)
+            {
+                return time.ToString("ss");
+            }
+            else if(time.Ticks == 0)
+            {
+                return "0";
+            }
+            else
+            {
+                return time.ToString("fff");
+            }
+                
+        }
+        private void ParamerusChartPanel_CurrentDeviceChanged(ParamerusPMBusDevice obj)
+        {
+            ((LineSeries)MyModel.Series[0]).Points.Clear();
+            timer = new Timer((e) => Dispatcher.Invoke(Update), null, 0, TimerPeriod);
+        }
+        private void Update()
+        {
+            if (Device != null && LastValue != null && Visibility == Visibility.Visible)
+            {
+                var series = (LineSeries)MyModel.Series[0];
+
+                double val = (double)LastValue;
+                double time = series.Points.Count == 0 ? 0 : series.Points.Last().X + TimerPeriod;
+
+
+                if (MyModel.Axes[0].Maximum < val + val * 0.1)
+                    MyModel.Axes[0].Maximum = val + val * 0.1;
+                if (MyModel.Axes[1].Maximum < time + time * 0.15)
+                    MyModel.Axes[1].Maximum = time + time * 0.15;
+
+
+                series.Points.Add(new DataPoint(time, val));
+                if (series.Points.Count > 500)
+                    series.Points.RemoveAt(0);
+                MyModel.InvalidatePlot(true);
             }
         }
 

@@ -1,17 +1,11 @@
 ﻿using ParamerusStudio.PMBus.Commands;
-using ParamerusStudio.VirtualDevice;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using TIDP;
 using TIDP.PMBus;
-using TIDP.PMBus.Commands;
 using TIDP.SAA;
 
 namespace ParamerusStudio.PMBus
@@ -108,7 +102,6 @@ namespace ParamerusStudio.PMBus
         #endregion
 
         #region Properties
-        private Timer timerUpdate;
         private Task updateTask = null;
         #region Status registers
         private ParamerusRegisterStatus _status_VOUT;
@@ -215,6 +208,7 @@ namespace ParamerusStudio.PMBus
         private double? _read_temp_int = 0.0;
         private double? _read_temp_ext = 0.0;
         private double? _freq = 0.0;
+        private double? _pout = 0.0;
 
         public double? Read_vin
         {
@@ -247,6 +241,8 @@ namespace ParamerusStudio.PMBus
                     return;
                 _read_vout = value;
                 OnPropertyChanged();
+                if (_read_vout != null && _read_iout != null)
+                    Read_pout = _read_vout * _read_iout;
             }
         }
         public double? Read_iout
@@ -258,6 +254,8 @@ namespace ParamerusStudio.PMBus
                     return;
                 _read_iout = value;
                 OnPropertyChanged();
+                if (_read_vout != null && _read_iout != null)
+                    Read_pout = _read_vout * _read_iout;
             }
         }
         public double? Read_temp_int
@@ -290,6 +288,15 @@ namespace ParamerusStudio.PMBus
                 if (_freq == value)
                     return;
                 _freq = value;
+                OnPropertyChanged();
+            }
+        }
+        public double? Read_pout
+        {
+            get => _pout;
+            set
+            {
+                _pout = value;
                 OnPropertyChanged();
             }
         }
@@ -591,7 +598,11 @@ namespace ParamerusStudio.PMBus
         public event PropertyChangedEventHandler PropertyChanged;
         void OnPropertyChanged([CallerMemberName] String name = "")
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            try
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            }
+            catch(Exception) { }
         }
         #endregion
     }

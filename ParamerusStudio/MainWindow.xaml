@@ -4,26 +4,14 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:dxa="http://schemas.devexpress.com/winfx/2008/xaml/accordion"
     xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
     xmlns:dxc="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:local="clr-namespace:ParamerusStudio"
     xmlns:component="clr-namespace:ParamerusStudio.Components"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:svg="clr-namespace:DevExpress.Utils.Svg;assembly=DevExpress.Data.v19.2"
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
-    xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking"
- 
-    xmlns:dxwui="http://schemas.devexpress.com/winfx/2008/xaml/windowsui"
-    xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
-    xmlns:dxt="http://schemas.devexpress.com/winfx/2008/xaml/core/themekeys"
-    xmlns:dxdiag="http://schemas.devexpress.com/winfx/2008/xaml/diagram"
-    xmlns:col="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:col1="clr-namespace:System.Collections;assembly=mscorlib"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
-    xmlns:forms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
-    xmlns:dxprg="http://schemas.devexpress.com/winfx/2008/xaml/propertygrid"
     Width="1499"
     Height="1000"
     mc:Ignorable="d"
@@ -226,6 +214,42 @@
                                                Grid.Row="6" 
                                                Grid.Column="0"
                                                Margin="5,0,4,4"/>
+
+                                        <TextBlock Text="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_vin,FallbackValue=0}"
+                                               HorizontalAlignment="Left"
+                                               Grid.Row="0" 
+                                               Grid.Column="1"
+                                               Margin="5,0,4,4"/>
+                                        <TextBlock Text="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_vout,FallbackValue=0}"
+                                               HorizontalAlignment="Left"
+                                               Grid.Row="1" 
+                                               Grid.Column="1"
+                                               Margin="5,0,4,4"/>
+                                        <TextBlock Text="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_iout,FallbackValue=0}"
+                                               HorizontalAlignment="Left"
+                                               Grid.Row="2" 
+                                               Grid.Column="1"
+                                               Margin="5,0,4,4"/>
+                                        <TextBlock Text="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_Pout,FallbackValue=0}"
+                                               HorizontalAlignment="Left"
+                                               Grid.Row="3" 
+                                               Grid.Column="1"
+                                               Margin="5,0,4,4"/>
+                                        <TextBlock Text="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_freq,FallbackValue=0}"
+                                               HorizontalAlignment="Left"
+                                               Grid.Row="4" 
+                                               Grid.Column="1"
+                                               Margin="5,0,4,4"/>
+                                        <TextBlock Text="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_temp_int,FallbackValue=0}"
+                                               HorizontalAlignment="Left"
+                                               Grid.Row="5" 
+                                               Grid.Column="1"
+                                               Margin="5,0,4,4"/>
+                                        <TextBlock Text="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_temp_ext,FallbackValue=0}"
+                                               HorizontalAlignment="Left"
+                                               Grid.Row="6" 
+                                               Grid.Column="1"
+                                               Margin="5,0,4,4"/>
                                     </Grid>
                                 </dxlc:GroupBox>
                                 <dxlc:GroupBox DockPanel.Dock="Left" 
@@ -422,7 +446,7 @@
                                                             VerticalAlignment="Bottom"
                                                             HorizontalAlignment="Stretch"
                                                             HorizontalContentAlignment="Left"
-                                                            
+                                                            ToolTip="Set control line."
                                                             DockPanel.Dock="Bottom"
                                                             VerticalContentAlignment="Center"
                                                             HorizontalIndicatorAlignment="Right"
@@ -734,6 +758,7 @@
                                                            TimerPeriod="{Binding ElementName=PeriodReadingCharts, Path=Value}"
                                                            Style="{StaticResource ParamerusChartPanelCustomStyle}"
                                                            VisibleLimitsPanel="{Binding ElementName=cbShowWarningFaultLimits, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                           MouseMove="VinChartPanel_MouseMove"
                                                            NamePanel="Vin - Input Voltage"/>
                                 <local:ParamerusChartPanel x:Name="VoutChartPanel"
                                                            LastValue="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_vout}"
@@ -751,6 +776,7 @@
                                                            NamePanel="Iout - Output Current"/>
                                 <local:ParamerusChartPanel x:Name="PoutChartPanel"  
                                                            Device="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
+                                                           LastValue="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_pout}"
                                                            TimerPeriod="{Binding ElementName=PeriodReadingCharts, Path=Value}"
                                                            VisibleLimitsPanel="{Binding ElementName=cbShowWarningFaultLimits, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                                            Style="{StaticResource ParamerusChartPanelCustomStyle}"
