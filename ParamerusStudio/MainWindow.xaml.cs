@@ -72,7 +72,7 @@ namespace ParamerusStudio
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            if(values.Contains(null) || values.Contains(DependencyProperty.UnsetValue))
+            if (values.Contains(null) || values.Contains(DependencyProperty.UnsetValue))
                 return Brushes.Red;
 
             LogicLevelResult res = values[1] as LogicLevelResult;
@@ -80,7 +80,7 @@ namespace ParamerusStudio
                 return Brushes.Red;
 
             bool isWarningBitSet = false;
-            for(int i=2;i<values.Length;i++)
+            for (int i = 2; i < values.Length; i++)
             {
                 BitStatus bs = (BitStatus)values[i];
                 switch (bs)
@@ -104,6 +104,24 @@ namespace ParamerusStudio
             return (object[])Binding.DoNothing;
         }
     }
+    /// <summary>
+    /// Конвертер значений, преобразовывающий считанное значение в отображение элемента
+    /// </summary>
+    public class ReadValueToVisibleConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null)
+                return Visibility.Collapsed;
+            else 
+                return Visibility.Visible;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return Binding.DoNothing;
+        }
+    }
     #endregion
 
     /// <summary>
@@ -112,7 +130,7 @@ namespace ParamerusStudio
     /// 
     public partial class MainWindow : DXWindow, INotifyPropertyChanged
     {
-        
+
         /// <summary>
         /// Найденный SMBus адаптер
         /// </summary>
@@ -161,7 +179,7 @@ namespace ParamerusStudio
         private void Image_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             this.DragMove();
-            
+
         }
 
         /// <summary>
@@ -219,7 +237,7 @@ namespace ParamerusStudio
                 cbDeviceList.SelectedIndex = 0;
                 CurrentPmBusDevice = PMBusDevices[0];
             });
-            
+
             SetStatus("PMBus-devices found!");
         }
 
@@ -243,8 +261,8 @@ namespace ParamerusStudio
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
-        
-        
+
+
         /// <summary>
         /// Событие изменения состояния индикаторной кнопки
         /// </summary>
@@ -253,8 +271,8 @@ namespace ParamerusStudio
         /// <param name="newState">Новое состояние кнопки</param>
         private void ParamerusIndicButton_StateIndexChanged(object sender, int oldState, int newState)
         {
-            
-            if(newState == 1)
+
+            if (newState == 1)
             {
                 if (PMBusDevices == null || CurrentPmBusDevice == null)
                 {
@@ -262,7 +280,7 @@ namespace ParamerusStudio
                     pib.CurrentStateIndex = 0;
                     return;
                 }
-                if(CurrentPmBusDevice.ControlLineSetHigh())
+                if (CurrentPmBusDevice.ControlLineSetHigh())
                 {
                     SetStatus("CONTROL LINE is High");
                 }
@@ -298,5 +316,5 @@ namespace ParamerusStudio
             panel.Focus();
         }
     }
-    }
+}
 

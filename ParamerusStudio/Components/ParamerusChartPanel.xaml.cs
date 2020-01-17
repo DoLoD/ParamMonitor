@@ -41,8 +41,8 @@ namespace ParamerusStudio
     /// </summary>
     public partial class ParamerusChartPanel : UserControl, INotifyPropertyChanged
     {
-        
 
+        public static readonly DependencyProperty VisibleValuesSeriesLabelProperty = DependencyProperty.Register("VisibleValuesSeriesLabel", typeof(bool), typeof(ParamerusChartPanel), new PropertyMetadata(true));
         public static readonly DependencyProperty VisibleLimitsPanelProperty = DependencyProperty.RegisterAttached("VisibleLimitsPanel",
                                                                                                                     typeof(bool?),
                                                                                                                     typeof(ParamerusChartPanel),
@@ -50,7 +50,7 @@ namespace ParamerusStudio
                                                                                                                         false,
                                                                                                                         FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
                                                                                                                         (o,args) => ((ParamerusChartPanel)o).SetVisibleLimitsPanel((bool)args.NewValue)));
-        public static readonly DependencyProperty LastValueProperty = DependencyProperty.Register("LastValue", typeof(double?), typeof(ParamerusChartPanel));
+        public static readonly DependencyProperty LastValueProperty = DependencyProperty.Register("LastValue", typeof(double?), typeof(ParamerusChartPanel), new PropertyMetadata(null));
         
         public static readonly DependencyProperty DeviceProperty = DependencyProperty.Register("Device", typeof(ParamerusPMBusDevice), typeof(ParamerusChartPanel),
                                                                                                                     new FrameworkPropertyMetadata(
@@ -73,6 +73,15 @@ namespace ParamerusStudio
             set
             {
                 SetValue(LastValueProperty, value);
+            }
+        }
+
+        public bool VisibleValuesSeriesLabel
+        {
+            get => (bool)GetValue(VisibleValuesSeriesLabelProperty);
+            set
+            {
+                SetValue(VisibleValuesSeriesLabelProperty, value);
             }
         }
         public event Action<ParamerusPMBusDevice> CurrentDeviceChanged;
@@ -165,7 +174,6 @@ namespace ParamerusStudio
             }
         }
 
-        public LineSeries ser = new LineSeries();
         public ParamerusChartPanel()
         {
             InitializeComponent();
@@ -185,9 +193,12 @@ namespace ParamerusStudio
                 Minimum = 0.0,
                 Maximum = 600000.0,
                 LabelFormatter=TimeLabelFormatter
+                
             });
-            ser = new LineSeries() { LineStyle = LineStyle.Solid , Color = OxyColor.FromArgb(0xFF,0xC2,0x00,0x00), StrokeThickness=2};
+            LineSeries ser = new LineSeries() { LineStyle = LineStyle.Solid , Color = OxyColor.FromArgb(0xFF,0xC2,0x00,0x00), StrokeThickness=2};
+            LineSeries ser_lab = new LineSeries() { LineStyle = LineStyle.Solid, Color = OxyColor.FromArgb(0xFF, 0xC2, 0x00, 0x00), StrokeThickness = 1, LabelMargin = 0, LabelFormatString = "{1:F3}" };
             MyModel.Series.Add(ser);
+            MyModel.Series.Add(ser_lab);
         }
         
         private String TimeLabelFormatter(double val)
@@ -225,7 +236,7 @@ namespace ParamerusStudio
             if (Device != null && LastValue != null && Visibility == Visibility.Visible)
             {
                 var series = (LineSeries)MyModel.Series[0];
-
+                var ser_labs = (LineSeries)MyModel.Series[1];
                 double val = (double)LastValue;
                 double time = series.Points.Count == 0 ? 0 : series.Points.Last().X + TimerPeriod;
 
@@ -235,11 +246,26 @@ namespace ParamerusStudio
                 if (MyModel.Axes[1].Maximum < time + time * 0.15)
                     MyModel.Axes[1].Maximum = time + time * 0.15;
 
-
+                
                 series.Points.Add(new DataPoint(time, val));
+                ser_labs.Points.Clear();
+                if (VisibleValuesSeriesLabel)
+                {
+                    ser_labs.Points.Add(new DataPoint(time, val));
+                }
+
+                
+
                 if (series.Points.Count > 500)
                     series.Points.RemoveAt(0);
                 MyModel.InvalidatePlot(true);
+            }
+            if(LastValue == null)
+            {
+                timer.Change(Timeout.Infinite, 0);
+                timer.Dispose();
+                timer = null;
+                VisiblePanel = false;
             }
         }
 

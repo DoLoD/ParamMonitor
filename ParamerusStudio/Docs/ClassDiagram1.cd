@@ -1,0 +1,267 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="ParamerusStudio.PMBus.Commands.ReadVoutCommand">
+    <Position X="9.75" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
+      <FileName>PMBus\Commands\CommandsBase.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ParamerusStudio.PMBus.Commands.ReadIoutCommand">
+    <Position X="6" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
+      <FileName>PMBus\Commands\CommandsBase.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ParamerusStudio.PMBus.Commands.ReadVinCommand">
+    <Position X="7.25" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>PMBus\Commands\CommandsBase.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ParamerusStudio.PMBus.Commands.ReadIinCommand">
+    <Position X="0.5" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>PMBus\Commands\CommandsBase.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ParamerusStudio.PMBus.Commands.ReadTemp1Command">
+    <Position X="5" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>PMBus\Commands\CommandsBase.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ParamerusStudio.PMBus.Commands.ReadTemp2Command">
+    <Position X="9.5" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>PMBus\Commands\CommandsBase.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ParamerusStudio.PMBus.Commands.ReadFreqCommand">
+    <Position X="2.75" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>PMBus\Commands\CommandsBase.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ParamerusStudio.PMBus.Commands.PMBusReadCommand">
+    <Position X="6" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAABAAAAAAAgAAAgAAABgAAAAAAAAAIAAAAABAAAAAA=</HashCode>
+      <FileName>PMBus\Commands\PMCommand.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="command_code" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="ParamerusStudio.PMBus.ParamerusPMBusDevice" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="9.75" Y="1" Width="2" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <AssociationLine Name="Status_VOUT" Type="ParamerusStudio.PMBus.ParamerusRegisterStatus" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="11.562" Y="1.562" />
+        <Point X="11.562" Y="3.542" />
+        <Point X="15.25" Y="3.542" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="2.099" Y="0.096" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="Status_CML" Type="ParamerusStudio.PMBus.ParamerusRegisterStatus" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="11.562" Y="1.562" />
+        <Point X="11.562" Y="4.189" />
+        <Point X="15.25" Y="4.189" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="2.206" Y="0.108" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="Status_Fans_1_2" Type="ParamerusStudio.PMBus.ParamerusRegisterStatus" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="11.562" Y="1.562" />
+        <Point X="11.562" Y="1.933" />
+        <Point X="15.25" Y="1.933" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="1.919" Y="0.084" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="Status_Fans_3_4" Type="ParamerusStudio.PMBus.ParamerusRegisterStatus" FixedToPoint="true">
+      <Path>
+        <Point X="11.75" Y="1.485" />
+        <Point X="15.25" Y="1.485" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="1.895" Y="0.072" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="Status_INPUT" Type="ParamerusStudio.PMBus.ParamerusRegisterStatus" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="11.562" Y="1.562" />
+        <Point X="11.562" Y="3.836" />
+        <Point X="15.25" Y="3.836" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="2.063" Y="0.06" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="Status_IOUT" Type="ParamerusStudio.PMBus.ParamerusRegisterStatus" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="11.562" Y="1.562" />
+        <Point X="11.562" Y="2.887" />
+        <Point X="15.25" Y="2.887" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="2.158" Y="0.084" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="Status_Mfr_Specific" Type="ParamerusStudio.PMBus.ParamerusRegisterStatus" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="11.562" Y="1.562" />
+        <Point X="11.562" Y="3.19" />
+        <Point X="15.25" Y="3.19" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="1.727" Y="0.06" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="Status_Other" Type="ParamerusStudio.PMBus.ParamerusRegisterStatus" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="11.562" Y="1.562" />
+        <Point X="11.562" Y="2.272" />
+        <Point X="15.25" Y="2.272" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="2.099" Y="0.072" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="Status_TEMP" Type="ParamerusStudio.PMBus.ParamerusRegisterStatus" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="11.562" Y="1.562" />
+        <Point X="11.562" Y="2.579" />
+        <Point X="15.25" Y="2.579" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="2.087" Y="0.084" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAQCBCCBBA0kUgEsIQAMkMBDxAkAkhMSBAACDAgQAEA=</HashCode>
+      <FileName>PMBus\ParamerusPMBusDevice.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Status_VOUT" />
+      <Property Name="Status_CML" />
+      <Property Name="Status_Fans_1_2" />
+      <Property Name="Status_Fans_3_4" />
+      <Property Name="Status_INPUT" />
+      <Property Name="Status_IOUT" />
+      <Property Name="Status_Mfr_Specific" />
+      <Property Name="Status_Other" />
+      <Property Name="Status_TEMP" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Field Name="read_commands" />
+    </ShowAsCollectionAssociation>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="ParamerusStudio.PMBus.ParamerusRegisterBit" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="15.5" Y="4.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAAAAABCIIAQAAAAAgAAABAAAAAAAAAAAAAQ=</HashCode>
+      <FileName>PMBus\ParamerusRegisterStatus.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="CurrentStatusBit" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="ParamerusStudio.PMBus.ParamerusRegisterStatus" BaseTypeListCollapsed="true">
+    <Position X="15.25" Y="1.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAAAAhAAAAIAAAABBAgAAAAAACAAAAAAAAAAA=</HashCode>
+      <FileName>PMBus\ParamerusRegisterStatus.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="StatusRegister" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Property Name="RegisterBits" />
+    </ShowAsCollectionAssociation>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="ParamerusStudio.MainWindow" BaseTypeListCollapsed="true">
+    <Position X="12" Y="5.5" Width="1.5" />
+    <AssociationLine Name="CurrentPmBusDevice" Type="ParamerusStudio.PMBus.ParamerusPMBusDevice" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="12.188" Y="5.5" />
+        <Point X="12.188" Y="5.112" />
+        <Point X="10.688" Y="5.112" />
+        <Point X="10.688" Y="1.562" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-1.605" Y="3.272" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="PMBusDevices" Type="ParamerusStudio.PMBus.ParamerusPMBusDevice" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="12.625" Y="5.5" />
+        <Point X="12.625" Y="4.609" />
+        <Point X="11.25" Y="4.609" />
+        <Point X="11.25" Y="1.562" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-1.174" Y="2.745" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAARABAAAQAAAAQAIgAAAABAwAQAACAAAAkAAAgAAAA=</HashCode>
+      <FileName>MainWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="CurrentPmBusDevice" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Property Name="PMBusDevices" />
+    </ShowAsCollectionAssociation>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Interface Name="ParamerusStudio.PMBus.Commands.IPMBusReadCommand">
+    <Position X="3.5" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
+      <FileName>PMBus\Commands\IPMCommand.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Enum Name="ParamerusStudio.PMBus.PMBusMode" Collapsed="true">
+    <Position X="8.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgA=</HashCode>
+      <FileName>PMBus\ParamerusPMBusDevice.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ParamerusStudio.PMBus.PMBusCode" Collapsed="true">
+    <Position X="3" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAEBAAAAAAAAAAAoWFMAQAABAAAAAAAAAAIGRAAAAIg=</HashCode>
+      <FileName>PMBus\ParamerusPMBusDevice.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ParamerusStudio.PMBus.BitStatus" Collapsed="true">
+    <Position X="18.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgACAAAAAAAAAAAAAABAAAAAAAAABAAAAAAAAAAA=</HashCode>
+      <FileName>PMBus\ParamerusRegisterStatus.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

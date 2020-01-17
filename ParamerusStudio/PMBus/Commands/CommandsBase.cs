@@ -12,21 +12,25 @@ namespace ParamerusStudio.PMBus.Commands
 
         public override object ReadCmd()
         {
-            if (checkNullPropertyDelegate != null && !checkNullPropertyDelegate())
-                return null;
-            var res_byte = GetParamBytes(command_code);
-            if (res_byte == null)
-                return null;
-            byte? mode_byte = GetCurrentMode();
-            if (mode_byte == null)
-                return null;
-            PMBusMode mode = (PMBusMode)(mode_byte >> 5);
-            byte exp = (byte)(mode_byte & 0x1F);
-            exp = (exp & 0x10) == 0 ? exp : (byte)(exp | 0xE0);
-            ushort mantissa = (ushort)((res_byte[0] << 8) | res_byte[1]);
             double? res = null;
-            if (mode == PMBusMode.Linear)
-                res = (double?)CalculateParam((sbyte)exp, mantissa);
+            if (checkNullPropertyDelegate == null || !checkNullPropertyDelegate())
+            {
+                var res_byte = GetParamBytes(command_code);
+                if (res_byte == null)
+                    goto EXIT_FUNC;
+                byte? mode_byte = GetCurrentMode();
+                if (mode_byte == null)
+                    goto EXIT_FUNC;
+                PMBusMode mode = (PMBusMode)(mode_byte >> 5);
+                byte exp = (byte)(mode_byte & 0x1F);
+                exp = (exp & 0x10) == 0 ? exp : (byte)(exp | 0xE0);
+                ushort mantissa = (ushort)((res_byte[0] << 8) | res_byte[1]);
+
+                if (mode == PMBusMode.Linear)
+                    res = (double?)CalculateParam((sbyte)exp, mantissa);
+
+                EXIT_FUNC:;
+            }
             propertyChangeDelegate(res);
             return res;
         }
@@ -42,14 +46,19 @@ namespace ParamerusStudio.PMBus.Commands
 
         public override object ReadCmd()
         {
-            var res_byte = GetParamBytes(command_code);
-            if (res_byte == null)
-                return null;
-            ushort res_val = (ushort)((res_byte[0] << 8) | res_byte[1]);
-            byte exp = (byte)(res_val >> 11);
-            exp = (exp & 0x10) == 0 ? exp : (byte)(exp | 0xF0);
-            ushort mantissa = (ushort)(res_val & 0x7FF);
-            double? res = (double?)CalculateParam((sbyte)exp, mantissa);
+            double? res = null;
+            if (checkNullPropertyDelegate == null || !checkNullPropertyDelegate())
+            {
+                var res_byte = GetParamBytes(command_code);
+                if (res_byte != null)
+                {
+                    ushort res_val = (ushort)((res_byte[0] << 8) | res_byte[1]);
+                    byte exp = (byte)(res_val >> 11);
+                    exp = (exp & 0x10) == 0 ? exp : (byte)(exp | 0xF0);
+                    ushort mantissa = (ushort)(res_val & 0x7FF);
+                    res = (double?)CalculateParam((sbyte)exp, mantissa);
+                }                    
+            }
             propertyChangeDelegate(res);
             return res;
         }

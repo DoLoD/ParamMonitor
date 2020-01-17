@@ -9,7 +9,7 @@ namespace ParamerusStudio.PMBus.Commands
         public PMBusCode command_code;
         public abstract object ReadCmd();
         protected Action<object> propertyChangeDelegate;
-        protected Func<bool> checkNullPropertyDelegate; 
+        protected Func<bool> checkNullPropertyDelegate;
         protected byte? GetCurrentMode()
         {
             var res_query = dev.SMBus_Read_Byte((byte)PMBusCode.VOUT_MODE);
