@@ -122,33 +122,6 @@ namespace ParamerusStudio
             return Binding.DoNothing;
         }
     }
-
-    /// <summary>
-    /// Конвертер значений, преобразовывающий количество отображаемых графиков в высоту контейнера
-    /// </summary>
-    public class WidthPanelChartsConverter : IMultiValueConverter
-    {
-        private bool IsVisiblePanel(object visibilityPanel)
-        {
-            if (!(visibilityPanel is Visibility))
-                return false;
-            return ((Visibility)visibilityPanel) == Visibility.Visible;
-        }
-
-        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
-        {
-            int count_visible = values.Count(IsVisiblePanel);
-            int row_count = count_visible / 2 + count_visible % 2;
-            return 1200;
-        }
-
-
-        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
-        {
-            return (object[])Binding.DoNothing;
-        }
-    }
-
     /// <summary>
     /// Конвертер значений, преобразовывающий количество отображаемых графиков в количество строк контейнера
     /// </summary>
@@ -176,7 +149,6 @@ namespace ParamerusStudio
             return (object[])Binding.DoNothing;
         }
     }
-
     /// <summary>
     /// Конвертер значений, преобразовывающий количество отображаемых графиков в количество столбцов
     /// </summary>
@@ -200,6 +172,42 @@ namespace ParamerusStudio
             return (object[])Binding.DoNothing;
         }
     }
+
+    /// <summary>
+    /// Конвертер значениий, преобразовывающий ширину заданную пользователем в ширину графика
+    /// </summary>
+    public class SizePlotsConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (((bool)values[0]) == false)
+                return Double.NaN;
+            else
+                return Double.Parse(values[1].ToString());
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            return (object[])Binding.DoNothing;
+        }
+    }
+
+    /// <summary>
+    /// Конвертер значениий, преобразовывающий высоту заданную пользователем в ширину графика
+    /// </summary>
+    public class HeightPlotsConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            return (object[])Binding.DoNothing;
+        }
+    }
+
     #endregion
 
     /// <summary>

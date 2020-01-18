@@ -31,9 +31,10 @@
     <local:StatusControlLineToStateIndicButtonConverter x:Key="StatusControlLineConv"/>
     <local:StatusRegsToIndicatorButtonBacgroundConverter x:Key="StatRegToIndBackgroundConv"/>
     <local:ReadValueToVisibleConverter x:Key="ReadValToVisibleConv"/>
-    <local:WidthPanelChartsConverter x:Key="WidthPanelChartConv"/>
     <local:RowCountPanelChartsConverter x:Key="RowCountPanelChartConv"/>
     <local:ColumnCountPanelChartsConverter x:Key="ColCountPanelChartConv"/>
+    <local:SizePlotsConverter x:Key="SizePlotsConv"/>
+    <local:HeightPlotsConverter x:Key="HeightChartConv"/>
 
     <Style x:Key="ToggleButtonMenuStyle" BasedOn="{StaticResource {x:Type ToggleButton}}" TargetType="RadioButton">
         <Setter Property="Width" Value="100"/>
