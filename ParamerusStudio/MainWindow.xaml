@@ -765,13 +765,140 @@
                             Height="Auto"
                             VerticalAlignment="Stretch"
                             BorderBrush="{StaticResource Paramerus.HeaderSplitter}">
-
-                        <dxlc:LayoutControl Padding="0" ScrollBars="Auto">
-                            <UniformGrid Columns="2"
-                                         
-                                     Rows="4"
-                                     Height="1200">
+<!--1200-->
+                        <dxlc:LayoutControl Padding="0" ScrollBars="None" Name="ChartsContainer">
+                            <!--<ListBox ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                <ListBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ListBox.ItemsPanel>
+                                <ListBoxItem>
+                                    <local:ParamerusChartPanel x:Name="VinChartPanel"
+                                                           VerticalAlignment="Stretch"
+                                                           HorizontalAlignment="Stretch"
+                                                           LastValue="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_vin}"
+                                                           Device="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
+                                                           TimerPeriod="{Binding ElementName=PeriodReadingCharts, Path=Value}"
+                                                           Style="{StaticResource ParamerusChartPanelCustomStyle}"
+                                                           VisibleLimitsPanel="{Binding ElementName=cbShowWarningFaultLimits, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                           VisibleValuesSeriesLabel="{Binding ElementName=cbShowValueLabelPlots, Path=IsChecked}"
+                                                           MouseMove="VinChartPanel_MouseMove"
+                                                           NamePanel="Vin - Input Voltage"/>
+                                </ListBoxItem>
+                                <ListBoxItem >
+                                    <local:ParamerusChartPanel x:Name="VoutChartPanel"
+                                                           VerticalAlignment="Stretch"
+                                                           HorizontalAlignment="Stretch"
+                                                           VisibleValuesSeriesLabel="{Binding ElementName=cbShowValueLabelPlots, Path=IsChecked}"
+                                                           LastValue="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_vout}"
+                                                           Device="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
+                                                           TimerPeriod="{Binding ElementName=PeriodReadingCharts, Path=Value}"
+                                                           VisibleLimitsPanel="{Binding ElementName=cbShowWarningFaultLimits, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                           Style="{StaticResource ParamerusChartPanelCustomStyle}"
+                                                           NamePanel="Vout - Output Voltage"/>
+                                </ListBoxItem>
+                                <ListBoxItem>
+                                    <local:ParamerusChartPanel x:Name="IoutChartPanel" 
+                                                           VerticalAlignment="Stretch"
+                                                           HorizontalAlignment="Stretch"
+                                                           VisibleValuesSeriesLabel="{Binding ElementName=cbShowValueLabelPlots, Path=IsChecked}"
+                                                           LastValue="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_iout}"
+                                                           Device="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
+                                                           TimerPeriod="{Binding ElementName=PeriodReadingCharts, Path=Value}"
+                                                           VisibleLimitsPanel="{Binding ElementName=cbShowWarningFaultLimits, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                           Style="{StaticResource ParamerusChartPanelCustomStyle}"
+                                                           NamePanel="Iout - Output Current"/>
+                                </ListBoxItem>
+                                <ListBoxItem>
+                                    <local:ParamerusChartPanel x:Name="PoutChartPanel"  
+                                                           VerticalAlignment="Stretch"
+                                                           HorizontalAlignment="Stretch"
+                                                           VisibleValuesSeriesLabel="{Binding ElementName=cbShowValueLabelPlots, Path=IsChecked}"
+                                                           Device="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
+                                                           LastValue="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_pout}"
+                                                           TimerPeriod="{Binding ElementName=PeriodReadingCharts, Path=Value}"
+                                                           VisibleLimitsPanel="{Binding ElementName=cbShowWarningFaultLimits, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                           Style="{StaticResource ParamerusChartPanelCustomStyle}"
+                                                           NamePanel="Pout(calc) - Output Power"/>
+                                </ListBoxItem>
+                                <ListBoxItem>
+                                    <local:ParamerusChartPanel x:Name="IntTempChartPanel" 
+                                                           VerticalAlignment="Stretch"
+                                                           HorizontalAlignment="Stretch"
+                                                           VisibleValuesSeriesLabel="{Binding ElementName=cbShowValueLabelPlots, Path=IsChecked}"
+                                                           LastValue="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_temp_int}"
+                                                           Device="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
+                                                           TimerPeriod="{Binding ElementName=PeriodReadingCharts, Path=Value}"
+                                                           VisibleLimitsPanel="{Binding ElementName=cbShowWarningFaultLimits, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                           Style="{StaticResource ParamerusChartPanelCustomStyle}"
+                                                           NamePanel="Temp Int - Temperature Internal"/>
+                                </ListBoxItem>
+                                <ListBoxItem>
+                                    <local:ParamerusChartPanel x:Name="ExtTempChartPanel" 
+                                                           VerticalAlignment="Stretch"
+                                                           HorizontalAlignment="Stretch"
+                                                           VisibleValuesSeriesLabel="{Binding ElementName=cbShowValueLabelPlots, Path=IsChecked}"
+                                                           LastValue="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_temp_ext}"
+                                                           Device="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
+                                                           TimerPeriod="{Binding ElementName=PeriodReadingCharts, Path=Value}"
+                                                           VisibleLimitsPanel="{Binding ElementName=cbShowWarningFaultLimits, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                           Style="{StaticResource ParamerusChartPanelCustomStyle}"
+                                                           NamePanel="Temp Ext - Temperature External"/>
+                                </ListBoxItem>
+                                <ListBoxItem>
+                                    <local:ParamerusChartPanel x:Name="AllTempChartPanel" 
+                                                           VerticalAlignment="Stretch"
+                                                           HorizontalAlignment="Stretch"
+                                                           VisibleValuesSeriesLabel="{Binding ElementName=cbShowValueLabelPlots, Path=IsChecked}"
+                                                           Device="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
+                                                           TimerPeriod="{Binding ElementName=PeriodReadingCharts, Path=Value}"
+                                                           VisibleLimitsPanel="{Binding ElementName=cbShowWarningFaultLimits, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                           Style="{StaticResource ParamerusChartPanelCustomStyle}"
+                                                           NamePanel="All Temp - All Temperatures"/>
+                                </ListBoxItem>
+                                <ListBoxItem>
+                                    <local:ParamerusChartPanel x:Name="FreqChartPanel" 
+                                                           VerticalAlignment="Stretch"
+                                                           HorizontalAlignment="Stretch"
+                                                           VisibleValuesSeriesLabel="{Binding ElementName=cbShowValueLabelPlots, Path=IsChecked}"
+                                                           LastValue="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_freq}"
+                                                           Device="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
+                                                           TimerPeriod="{Binding ElementName=PeriodReadingCharts, Path=Value}"
+                                                           VisibleLimitsPanel="{Binding ElementName=cbShowWarningFaultLimits, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                           Style="{StaticResource ParamerusChartPanelCustomStyle}"
+                                                           NamePanel="Freq - Frequency"/>
+                                </ListBoxItem>
+                            </ListBox>-->
+                            <UniformGrid HorizontalAlignment="Stretch" 
+                                         VerticalAlignment="Stretch">
+                                <UniformGrid.Columns>
+                                    <MultiBinding Converter="{StaticResource ColCountPanelChartConv}">
+                                        <Binding ElementName="VinChartPanel" Path="Visibility"/>
+                                        <Binding ElementName="VoutChartPanel" Path="Visibility"/>
+                                        <Binding ElementName="IoutChartPanel" Path="Visibility"/>
+                                        <Binding ElementName="PoutChartPanel" Path="Visibility"/>
+                                        <Binding ElementName="IntTempChartPanel" Path="Visibility"/>
+                                        <Binding ElementName="ExtTempChartPanel" Path="Visibility"/>
+                                        <Binding ElementName="AllTempChartPanel" Path="Visibility"/>
+                                        <Binding ElementName="FreqChartPanel" Path="Visibility"/>
+                                    </MultiBinding>
+                                </UniformGrid.Columns>
+                                <UniformGrid.Rows>
+                                    <MultiBinding Converter="{StaticResource RowCountPanelChartConv}">
+                                        <Binding ElementName="VinChartPanel" Path="Visibility"/>
+                                        <Binding ElementName="VoutChartPanel" Path="Visibility"/>
+                                        <Binding ElementName="IoutChartPanel" Path="Visibility"/>
+                                        <Binding ElementName="PoutChartPanel" Path="Visibility"/>
+                                        <Binding ElementName="IntTempChartPanel" Path="Visibility"/>
+                                        <Binding ElementName="ExtTempChartPanel" Path="Visibility"/>
+                                        <Binding ElementName="AllTempChartPanel" Path="Visibility"/>
+                                        <Binding ElementName="FreqChartPanel" Path="Visibility"/>
+                                    </MultiBinding>
+                                </UniformGrid.Rows>
                                 <local:ParamerusChartPanel x:Name="VinChartPanel"
+                                                           VerticalAlignment="Stretch"
+                                                           HorizontalAlignment="Stretch"
                                                            LastValue="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_vin}"
                                                            Device="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
                                                            TimerPeriod="{Binding ElementName=PeriodReadingCharts, Path=Value}"
@@ -781,6 +908,8 @@
                                                            MouseMove="VinChartPanel_MouseMove"
                                                            NamePanel="Vin - Input Voltage"/>
                                 <local:ParamerusChartPanel x:Name="VoutChartPanel"
+                                                           VerticalAlignment="Stretch"
+                                                           HorizontalAlignment="Stretch"
                                                            VisibleValuesSeriesLabel="{Binding ElementName=cbShowValueLabelPlots, Path=IsChecked}"
                                                            LastValue="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_vout}"
                                                            Device="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
@@ -789,6 +918,8 @@
                                                            Style="{StaticResource ParamerusChartPanelCustomStyle}"
                                                            NamePanel="Vout - Output Voltage"/>
                                 <local:ParamerusChartPanel x:Name="IoutChartPanel" 
+                                                           VerticalAlignment="Stretch"
+                                                           HorizontalAlignment="Stretch"
                                                            VisibleValuesSeriesLabel="{Binding ElementName=cbShowValueLabelPlots, Path=IsChecked}"
                                                            LastValue="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_iout}"
                                                            Device="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
@@ -797,6 +928,8 @@
                                                            Style="{StaticResource ParamerusChartPanelCustomStyle}"
                                                            NamePanel="Iout - Output Current"/>
                                 <local:ParamerusChartPanel x:Name="PoutChartPanel"  
+                                                           VerticalAlignment="Stretch"
+                                                           HorizontalAlignment="Stretch"
                                                            VisibleValuesSeriesLabel="{Binding ElementName=cbShowValueLabelPlots, Path=IsChecked}"
                                                            Device="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
                                                            LastValue="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_pout}"
@@ -805,6 +938,8 @@
                                                            Style="{StaticResource ParamerusChartPanelCustomStyle}"
                                                            NamePanel="Pout(calc) - Output Power"/>
                                 <local:ParamerusChartPanel x:Name="IntTempChartPanel" 
+                                                           VerticalAlignment="Stretch"
+                                                           HorizontalAlignment="Stretch"
                                                            VisibleValuesSeriesLabel="{Binding ElementName=cbShowValueLabelPlots, Path=IsChecked}"
                                                            LastValue="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_temp_int}"
                                                            Device="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
@@ -813,6 +948,8 @@
                                                            Style="{StaticResource ParamerusChartPanelCustomStyle}"
                                                            NamePanel="Temp Int - Temperature Internal"/>
                                 <local:ParamerusChartPanel x:Name="ExtTempChartPanel" 
+                                                           VerticalAlignment="Stretch"
+                                                           HorizontalAlignment="Stretch"
                                                            VisibleValuesSeriesLabel="{Binding ElementName=cbShowValueLabelPlots, Path=IsChecked}"
                                                            LastValue="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_temp_ext}"
                                                            Device="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
@@ -821,6 +958,8 @@
                                                            Style="{StaticResource ParamerusChartPanelCustomStyle}"
                                                            NamePanel="Temp Ext - Temperature External"/>
                                 <local:ParamerusChartPanel x:Name="AllTempChartPanel" 
+                                                           VerticalAlignment="Stretch"
+                                                           HorizontalAlignment="Stretch"
                                                            VisibleValuesSeriesLabel="{Binding ElementName=cbShowValueLabelPlots, Path=IsChecked}"
                                                            Device="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
                                                            TimerPeriod="{Binding ElementName=PeriodReadingCharts, Path=Value}"
@@ -828,6 +967,8 @@
                                                            Style="{StaticResource ParamerusChartPanelCustomStyle}"
                                                            NamePanel="All Temp - All Temperatures"/>
                                 <local:ParamerusChartPanel x:Name="FreqChartPanel" 
+                                                           VerticalAlignment="Stretch"
+                                                           HorizontalAlignment="Stretch"
                                                            VisibleValuesSeriesLabel="{Binding ElementName=cbShowValueLabelPlots, Path=IsChecked}"
                                                            LastValue="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_freq}"
                                                            Device="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"

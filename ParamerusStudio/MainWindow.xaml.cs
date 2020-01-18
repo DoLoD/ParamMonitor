@@ -113,13 +113,91 @@ namespace ParamerusStudio
         {
             if (value == null)
                 return Visibility.Collapsed;
-            else 
+            else
                 return Visibility.Visible;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return Binding.DoNothing;
+        }
+    }
+
+    /// <summary>
+    /// Конвертер значений, преобразовывающий количество отображаемых графиков в высоту контейнера
+    /// </summary>
+    public class WidthPanelChartsConverter : IMultiValueConverter
+    {
+        private bool IsVisiblePanel(object visibilityPanel)
+        {
+            if (!(visibilityPanel is Visibility))
+                return false;
+            return ((Visibility)visibilityPanel) == Visibility.Visible;
+        }
+
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            int count_visible = values.Count(IsVisiblePanel);
+            int row_count = count_visible / 2 + count_visible % 2;
+            return 1200;
+        }
+
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            return (object[])Binding.DoNothing;
+        }
+    }
+
+    /// <summary>
+    /// Конвертер значений, преобразовывающий количество отображаемых графиков в количество строк контейнера
+    /// </summary>
+    public class RowCountPanelChartsConverter : IMultiValueConverter
+    {
+        private bool IsVisiblePanel(object visibilityPanel)
+        {
+            if (!(visibilityPanel is Visibility))
+                return false;
+            return ((Visibility)visibilityPanel) == Visibility.Visible;
+        }
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            int count_visible = values.Count(IsVisiblePanel);
+            if (count_visible <= 4)
+                return count_visible;
+            if (count_visible <= 6)
+                return 3;
+            return 4;
+        }
+
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            return (object[])Binding.DoNothing;
+        }
+    }
+
+    /// <summary>
+    /// Конвертер значений, преобразовывающий количество отображаемых графиков в количество столбцов
+    /// </summary>
+    public class ColumnCountPanelChartsConverter : IMultiValueConverter
+    {
+        private bool IsVisiblePanel(object visibilityPanel)
+        {
+            if (!(visibilityPanel is Visibility))
+                return false;
+            return ((Visibility)visibilityPanel) == Visibility.Visible;
+        }
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            int count_visible = values.Count(IsVisiblePanel);
+            return (count_visible <= 4) ? 1 : 2;
+        }
+
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            return (object[])Binding.DoNothing;
         }
     }
     #endregion

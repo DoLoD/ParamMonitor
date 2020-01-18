@@ -31,6 +31,9 @@
     <local:StatusControlLineToStateIndicButtonConverter x:Key="StatusControlLineConv"/>
     <local:StatusRegsToIndicatorButtonBacgroundConverter x:Key="StatRegToIndBackgroundConv"/>
     <local:ReadValueToVisibleConverter x:Key="ReadValToVisibleConv"/>
+    <local:WidthPanelChartsConverter x:Key="WidthPanelChartConv"/>
+    <local:RowCountPanelChartsConverter x:Key="RowCountPanelChartConv"/>
+    <local:ColumnCountPanelChartsConverter x:Key="ColCountPanelChartConv"/>
 
     <Style x:Key="ToggleButtonMenuStyle" BasedOn="{StaticResource {x:Type ToggleButton}}" TargetType="RadioButton">
         <Setter Property="Width" Value="100"/>
@@ -502,9 +505,8 @@
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
     </Style>
-    
+
     <Style x:Key="ParamerusChartPanelCustomStyle" TargetType="local:ParamerusChartPanel">
-        <Setter Property="MaxHeight" Value="400"/>
         <Setter Property="Margin" Value="10,0,5,7"/>
         
     </Style>

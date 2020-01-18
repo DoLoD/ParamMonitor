@@ -260,7 +260,7 @@ namespace ParamerusStudio
                     series.Points.RemoveAt(0);
                 MyModel.InvalidatePlot(true);
             }
-            if(LastValue == null)
+            if(LastValue == null && timer != null)
             {
                 timer.Change(Timeout.Infinite, 0);
                 timer.Dispose();
