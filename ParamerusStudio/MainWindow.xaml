@@ -23,7 +23,6 @@
 
     <Window.Resources>
         <ResourceDictionary Source="/ParamerusStudio;component/Components/ComponentStyles.xaml" />
-        
     </Window.Resources>
     
     <dxc:DXWindow.HeaderItems>
