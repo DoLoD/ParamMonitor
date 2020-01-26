@@ -84,7 +84,7 @@
                                                       HorizontalAlignment="Center"/>
                     </Grid>
                 </dxlc:LayoutControl>
-                <dxlc:LayoutControl DockPanel.Dock="Top">
+                <!--<dxlc:LayoutControl DockPanel.Dock="Top">
                     <ListBox x:Name="lines_legend" 
                              DockPanel.Dock="Top" 
                              VerticalAlignment="Top"
@@ -106,7 +106,7 @@
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ListBox>
-                </dxlc:LayoutControl>
+                </dxlc:LayoutControl>-->
 
 
                 <dxlc:LayoutControl DockPanel.Dock="Bottom"

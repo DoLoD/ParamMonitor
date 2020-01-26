@@ -197,6 +197,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Components\PlotUpdateSheduler.cs" />
     <Compile Include="VirtualDevice\VirtualDev.cs" />
     <Page Include="Components\ComponentStyles.xaml">
       <SubType>Designer</SubType>

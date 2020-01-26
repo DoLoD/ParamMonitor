@@ -19,6 +19,36 @@ namespace ParamerusStudio
 {
     #region Converters
 
+    public class AlignmentPlotsConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null)
+                return Binding.DoNothing;
+            bool check = (bool)value;
+            if (targetType == typeof(HorizontalAlignment))
+            {
+                if (check)
+                    return HorizontalAlignment.Stretch;
+                else
+                    return HorizontalAlignment.Left;
+            }
+            else if (targetType == typeof(VerticalAlignment))
+            {
+                if (check)
+                    return VerticalAlignment.Stretch;
+                else
+                    return VerticalAlignment.Top;
+            }
+            else
+                return Binding.DoNothing;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return Binding.DoNothing;
+        }
+    }
     /// <summary>
     /// Конвертер значений, преобразовывающий регистр статуса в коллекцию бит
     /// </summary>

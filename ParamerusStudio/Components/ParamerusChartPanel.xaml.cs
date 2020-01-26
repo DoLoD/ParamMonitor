@@ -49,15 +49,22 @@ namespace ParamerusStudio
                                                                                                                     new FrameworkPropertyMetadata(
                                                                                                                         false,
                                                                                                                         FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
-                                                                                                                        (o,args) => ((ParamerusChartPanel)o).SetVisibleLimitsPanel((bool)args.NewValue)));
+                                                                                                                        (o, args) => ((ParamerusChartPanel)o).SetVisibleLimitsPanel((bool)args.NewValue)));
         public static readonly DependencyProperty LastValueProperty = DependencyProperty.Register("LastValue", typeof(double?), typeof(ParamerusChartPanel), new PropertyMetadata(null));
-        
+
         public static readonly DependencyProperty DeviceProperty = DependencyProperty.Register("Device", typeof(ParamerusPMBusDevice), typeof(ParamerusChartPanel),
                                                                                                                     new FrameworkPropertyMetadata(
                                                                                                                         null,
                                                                                                                         FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
                                                                                                                         (o, args) => ((ParamerusChartPanel)o).CurrentDeviceChanged?.Invoke((ParamerusPMBusDevice)args.NewValue)));
-        public static readonly DependencyProperty TimerPeriodProperty = DependencyProperty.Register("TimerPeriod", typeof(int), typeof(ParamerusChartPanel));
+        public static readonly DependencyProperty TimerPeriodProperty = DependencyProperty.Register("TimerPeriod", typeof(int), typeof(ParamerusChartPanel), new FrameworkPropertyMetadata(
+                                                                                                                        500));
+
+        public static readonly DependencyProperty IntervalReadingProperty = DependencyProperty.Register("IntervalReading", typeof(long), typeof(ParamerusChartPanel),
+                                                                                                                    new FrameworkPropertyMetadata(
+                                                                                                                        60000l,
+                                                                                                                        FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
+                                                                                                                        (o, args) => ((ParamerusChartPanel)o).IntervalReadingChanged(args.NewValue)));
 
         public static void VisibleLimitPanelChanged(DependencyObject d, DependencyPropertyChangedEventArgs args)
         {
@@ -66,6 +73,52 @@ namespace ParamerusStudio
             (d as ParamerusChartPanel).SetVisibleLimitsPanel((bool)args.NewValue);
         }
 
+        public void IntervalReadingChanged(object newValue)
+        {
+            if (MyModel.Axes.Count != 2 && VisiblePanel == false)
+                return;
+            ulong new_interval = Convert.ToUInt64(newValue);
+            ulong current_min = Convert.ToUInt64(MyModel.Axes[1].Minimum);
+            ulong current_max = Convert.ToUInt64(MyModel.Axes[1].Maximum);
+            ulong plot_delta = Convert.ToUInt64(new_interval * 0.15);
+            ulong last_series_val = 0;
+            ElementCollection<Series> collection_series = MyModel.Series;
+            if (collection_series.Count != 0)
+            {
+                LineSeries series = collection_series[0] as LineSeries;
+                if (series.Points.Count != 0)
+                {
+                    last_series_val = Convert.ToUInt64(series.Points.Last().X);
+                }
+            }
+
+            if(last_series_val == 0 || last_series_val < new_interval)
+            {
+                current_min = last_series_val;
+                current_max = new_interval;
+            }
+            else
+            {
+                current_min = last_series_val - new_interval;
+                current_max = last_series_val + plot_delta;
+            }
+
+            ulong major_step = new_interval / 3;
+            ulong minor_step = major_step / 4;
+            MyModel.Axes[1].MajorStep = Convert.ToDouble(major_step);
+            MyModel.Axes[1].MinorStep = Convert.ToDouble(minor_step);
+            MyModel.Axes[1].Minimum = current_min;
+            MyModel.Axes[1].Maximum = current_max;
+            MyModel.InvalidatePlot(true);
+        }
+        public long IntervalReading
+        {
+            get => (long)GetValue(IntervalReadingProperty);
+            set
+            {
+                SetValue(IntervalReadingProperty, value);
+            }
+        }
 
         public double? LastValue
         {
@@ -130,7 +183,7 @@ namespace ParamerusStudio
 
         public int TimerPeriod
         {
-            get => Dispatcher.Invoke<int>(()=>(int)GetValue(TimerPeriodProperty));
+            get => Dispatcher.Invoke<int>(() => (int)GetValue(TimerPeriodProperty));
             set
             {
                 SetValue(TimerPeriodProperty, value);
@@ -138,6 +191,8 @@ namespace ParamerusStudio
         }
         public String NamePanel { get; set; }
         private Timer timer { get; set; }
+        private Task updateTask { get; set; }
+        private CancellationTokenSource cancelToken { get; set; }
         private bool? _visible_panel;
         public bool? VisiblePanel
         {
@@ -145,11 +200,18 @@ namespace ParamerusStudio
             set
             {
                 if (value == false)
+                {
+                    cancelToken?.Cancel();
                     this.Visibility = Visibility.Collapsed;
+                }
+                   
                 else
+                {
                     this.Visibility = Visibility.Visible;
+                    StartUpdate();
+                }
+                   
                 _visible_panel = value;
-                
                 OnPropertyChanged();
             }
         }
@@ -185,14 +247,18 @@ namespace ParamerusStudio
             {
                 Position = AxisPosition.Left,
                 Minimum = 0.0,
+                IsZoomEnabled = false,
                 Maximum = 0.5,
             });
             MyModel.Axes.Add(new LinearAxis
             {
                 Position = AxisPosition.Bottom,
                 Minimum = 0.0,
-                Maximum = 600000.0,
-                LabelFormatter=TimeLabelFormatter
+                Maximum = IntervalReading,
+                MajorStep = IntervalReading / 3,
+                MinorStep = (IntervalReading / 3) / 4,
+                IsZoomEnabled = false,
+                LabelFormatter =TimeLabelFormatter
                 
             });
             LineSeries ser = new LineSeries() { LineStyle = LineStyle.Solid , Color = OxyColor.FromArgb(0xFF,0xC2,0x00,0x00), StrokeThickness=2};
@@ -226,10 +292,35 @@ namespace ParamerusStudio
             }
                 
         }
+
+        private void StartUpdate()
+        {
+            ElementCollection<Series> collection_series = MyModel.Series;
+            if (collection_series.Count == 0)
+                return;
+            LineSeries series = collection_series[0] as LineSeries;
+            series.Points.Clear();
+            MyModel.Axes[1].Minimum = 0;
+            MyModel.Axes[1].Maximum = IntervalReading;
+            cancelToken = new CancellationTokenSource();
+            updateTask = new Task(TaskUpdateAction, cancelToken.Token, cancelToken.Token);
+            updateTask.Start();
+        }
         private void ParamerusChartPanel_CurrentDeviceChanged(ParamerusPMBusDevice obj)
         {
-            ((LineSeries)MyModel.Series[0]).Points.Clear();
-            timer = new Timer((e) => Dispatcher.Invoke(Update), null, 0, TimerPeriod);
+            StartUpdate();
+        }
+
+        private void TaskUpdateAction(object ct)
+        {
+            if (ct == null || !(ct is CancellationToken))
+                return;
+            CancellationToken token = (CancellationToken)ct;
+            while(!token.IsCancellationRequested)
+            {
+                this.Dispatcher.Invoke(Update);
+                Thread.Sleep(TimerPeriod);
+            }
         }
         private void Update()
         {
@@ -243,36 +334,30 @@ namespace ParamerusStudio
 
                 if (MyModel.Axes[0].Maximum < val + val * 0.1)
                     MyModel.Axes[0].Maximum = val + val * 0.1;
-                if (MyModel.Axes[1].Maximum < time + time * 0.15)
-                    MyModel.Axes[1].Maximum = time + time * 0.15;
 
-                
+                long delta_plot = Convert.ToInt64(IntervalReading * 0.15);
+                if (MyModel.Axes[1].Maximum < time + delta_plot)
+                {
+                    MyModel.Axes[1].Maximum = time + delta_plot;
+                    MyModel.Axes[1].Minimum = MyModel.Axes[1].Maximum - IntervalReading;
+                }
+                                    
                 series.Points.Add(new DataPoint(time, val));
                 ser_labs.Points.Clear();
                 if (VisibleValuesSeriesLabel)
                 {
                     ser_labs.Points.Add(new DataPoint(time, val));
                 }
-
-                
-
-                if (series.Points.Count > 500)
+                if (series.Points.Count > 1500)
                     series.Points.RemoveAt(0);
                 MyModel.InvalidatePlot(true);
             }
-            if(LastValue == null && timer != null)
-            {
-                timer.Change(Timeout.Infinite, 0);
-                timer.Dispose();
-                timer = null;
+
+            if (LastValue == null)
                 VisiblePanel = false;
-            }
+
         }
 
-        private void TimerTick(object state)
-        {
-            
-        }
 
         private void HeaderCloseButton_Click(object sender, RoutedEventArgs e)
         {

@@ -507,9 +507,9 @@
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
     </Style>
 
+    <local:AlignmentPlotsConverter x:Key="AlignPlotsConv"/>
     <Style x:Key="ParamerusChartPanelCustomStyle" TargetType="local:ParamerusChartPanel">
         <Setter Property="Margin" Value="10,0,5,7"/>
-        
     </Style>
 
     <Style x:Key="AccordionMenuItemSizeStyle" TargetType="dxa:AccordionItem">
