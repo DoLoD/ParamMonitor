@@ -20,8 +20,25 @@ namespace ParamerusStudio
     /// </summary>
     public partial class ParamerusChartSpinEdit : UserControl
     {
-        public String NameValue { get; set; }
-        public double Value { get; set; }
+        public static readonly DependencyProperty NameValueProperty = DependencyProperty.Register(nameof(NameValue), typeof(String), typeof(ParamerusChartSpinEdit));
+        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register(nameof(Value), typeof(double), typeof(ParamerusChartSpinEdit));
+
+        public String NameValue 
+        {
+            get => (String)GetValue(NameValueProperty);
+            set
+            {
+                SetValue(NameValueProperty, value);
+            }
+        }
+        public double Value
+        {
+            get => (double)GetValue(ValueProperty);
+            set
+            {
+                SetValue(ValueProperty, value);
+            }
+        }
         public String UnitsName { get; set; }
         public ParamerusChartSpinEdit()
         {

@@ -35,8 +35,28 @@
                             Margin="0,0,5,0"/>
                 </dxlc:LayoutControl>
                 <dxlc:LayoutControl Name="LimitsPanel" 
-                                    DockPanel.Dock="Top">
-                    <Grid>
+                                    DockPanel.Dock="Top"
+                                    ScrollBars="None">
+                    <ListBox ItemsSource="{Binding ElementName=ParamChartPanel, Path=LimitsItemSource}"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="4"/>
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <local:ParamerusChartSpinEdit Grid.Row="0"
+                                                      Grid.Column="0"
+                                                      Margin="0,0,0,5"
+                                                      NameValue="{Binding Path=Key}"
+                                                      Value="{Binding Path=Value}"
+                                                      UnitsName="V"
+                                                      HorizontalAlignment="Center"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <!--<Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition/>
                             <RowDefinition/>
@@ -82,33 +102,8 @@
                                                       NameValue="UVF:"
                                                       UnitsName="V"
                                                       HorizontalAlignment="Center"/>
-                    </Grid>
+                    </Grid>-->
                 </dxlc:LayoutControl>
-                <!--<dxlc:LayoutControl DockPanel.Dock="Top">
-                    <ListBox x:Name="lines_legend" 
-                             DockPanel.Dock="Top" 
-                             VerticalAlignment="Top"
-                             BorderThickness="0">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <UniformGrid Columns="4"
-                                             Rows="2" 
-                                             VerticalAlignment="Top"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <CheckBox IsChecked="{Binding Path=Visibility, Converter={StaticResource VisibilityToCheckedConverter}, Mode=TwoWay}"/>
-                                    <Rectangle Width="15" Height="15" Fill="{Binding Path=Stroke}"/>
-                                    <TextBlock Margin="5,0,0,0" Text="{Binding Path=Description}"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ListBox>
-                </dxlc:LayoutControl>-->
-
-
                 <dxlc:LayoutControl DockPanel.Dock="Bottom"
                                     VerticalAlignment="Stretch"
                                     Padding="20,0,20,0">

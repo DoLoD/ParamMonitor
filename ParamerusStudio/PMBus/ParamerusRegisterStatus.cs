@@ -9,65 +9,6 @@ using System.Windows.Media;
 namespace ParamerusStudio.PMBus
 {
 
-    #region Converters
-    /// <summary>
-    /// Конвертер значений, отвечающий за преобразование состояния регистра статуса в цвет фона заголовка таблицы на форме
-    /// </summary>
-    public class StatusRegisterToBackgroundConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value == null)
-                return Brushes.Transparent;
-            BitStatus bs = (BitStatus)value;
-            switch(bs)
-            {
-                case BitStatus.Fault:
-                    return new SolidColorBrush(Color.FromArgb(0xFF, 0xFE, 0x00, 0x00));
-                case BitStatus.Warning:
-                    return new SolidColorBrush(Color.FromArgb(0xFF, 0xFE, 0xA4, 0x00));
-                case BitStatus.BitNotImplemented:
-                    return new SolidColorBrush(Color.FromArgb(0xFF, 0xF4, 0xF4, 0xF4));
-                default:
-                    return Brushes.Transparent;
-            }
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return Binding.DoNothing;
-        }
-    }
-    /// <summary>
-    /// Конвертер значений, отвечающий за преобразование состояния регистра статуса в цвет текста заголовка таблицы на форме
-    /// </summary>
-    public class StatusRegisterToForegroundConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value == null)
-                return Brushes.Black;
-            BitStatus bs = (BitStatus)value;
-            switch (bs)
-            {
-                case BitStatus.Fault:
-                    return Brushes.White;
-                case BitStatus.Warning:
-                    return Brushes.Black;
-                case BitStatus.BitNotImplemented:
-                    return new SolidColorBrush(Color.FromArgb(0xFF,0x83,0x83,0x83));
-                default:
-                    return Brushes.Black;
-            }
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return Binding.DoNothing;
-        }
-    }
-    #endregion
-
     public enum BitStatus
     {
         BitNotSet,
@@ -145,7 +86,7 @@ namespace ParamerusStudio.PMBus
     public class ParamerusRegisterStatus : INotifyPropertyChanged
     {
         private BitStatus _statusRegister = BitStatus.BitNotSet;
-        private byte _register_value;
+        private byte? _register_value;
         /// <summary>
         /// Текущее состояние регистра, Fault - если хотя бы один из бит выставлен как Fault, Warning - если хотя бы один из бит выставлен как Warning
         /// </summary>
@@ -167,19 +108,25 @@ namespace ParamerusStudio.PMBus
         /// Коллекция бит регистра
         /// </summary>
         public List<ParamerusRegisterBit> RegisterBits { get; set; } = new List<ParamerusRegisterBit>();
-        public byte RegisterValue
+        public byte? RegisterValue
         {
             get => _register_value;
             set
             {
-                if(_register_value != value)
+                if(value == null)
+                {
+                    _register_value = value;
+                    StatusRegister = BitStatus.BitNotImplemented;
+                    OnPropertyChanged();
+                }  
+                else if(_register_value != value)
                 {
                     _register_value = value;
                     bool isFaultSet = false;
                     bool isWarningSet = false;
                     for (int i=0;i<8;i++)
                     {
-                        RegisterBits[i].SetBit((_register_value >> i) & 0x1);
+                        RegisterBits[i].SetBit(((int)_register_value >> i) & 0x1);
                         switch(RegisterBits[i].CurrentStatusBit)
                         {
                             case BitStatus.Fault:

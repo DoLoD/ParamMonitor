@@ -18,36 +18,7 @@ using System.Windows.Shapes;
 
 namespace ParamerusStudio.Components
 {
-    /// <summary>
-    /// Конвертер значений, возвращающий текст текущего состояния кнопки из коллекции состояний и индекса нового состояния.
-    /// </summary>
-    public class StatesButtonConverter : IMultiValueConverter
-    {
-
-        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (values == null || values[0] == null || values[1] == null)
-                throw new ArgumentNullException(nameof(values),"Argument null");
-            if(values[0] is int && values[1] is List<String>)
-            {
-                int ind = (int)values[0];
-                List<String> states = values[1] as List<String>;
-                if (states.Count <= ind || (ind < -1))
-                    throw new ArgumentOutOfRangeException(nameof(values),"Argument out of boundary states indicator button.");
-                else if (ind == -1)
-                    return "";
-                else
-                    return states[ind];
-            }
-            throw new ArgumentException("Argument type error.", nameof(values));
-        }
-
-
-        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
-        {
-            return (object[])Binding.DoNothing;
-        }
-    }
+    
 
     /// <summary>
     /// Класс, описывающий функциона индикаторной кнопки

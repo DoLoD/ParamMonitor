@@ -197,7 +197,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Components\Converters.cs" />
+    <Compile Include="Components\ObservableDictionary.cs" />
     <Compile Include="Components\PlotUpdateSheduler.cs" />
+    <Compile Include="PMBus\Commands\PMBusCommandBase.cs" />
+    <Compile Include="PMBus\Commands\IPMBusWriteCommand.cs" />
     <Compile Include="VirtualDevice\VirtualDev.cs" />
     <Page Include="Components\ComponentStyles.xaml">
       <SubType>Designer</SubType>
@@ -240,8 +244,7 @@
       <DependentUpon>ParamerusChartSpinEdit.xaml</DependentUpon>
     </Compile>
     <Compile Include="PMBus\Commands\CommandsBase.cs" />
-    <Compile Include="PMBus\Commands\IPMCommand.cs" />
-    <Compile Include="PMBus\Commands\PMCommand.cs" />
+    <Compile Include="PMBus\Commands\IPMBusReadCommand.cs" />
     <Compile Include="PMBus\ParamerusPMBusDevice.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -264,6 +267,7 @@
       <Link>.editorconfig</Link>
     </None>
     <None Include="Docs\ClassDiagram1.cd" />
+    <None Include="Docs\PMBusDiagram.cd" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

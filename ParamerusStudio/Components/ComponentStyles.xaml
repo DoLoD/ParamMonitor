@@ -1,10 +1,12 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:ParamerusStudio"
-                    xmlns:dxa="http://schemas.devexpress.com/winfx/2008/xaml/accordion"
                     xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
-                    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-                    xmlns:pmbus="clr-namespace:ParamerusStudio.PMBus">
+                    xmlns:pmbus="clr-namespace:ParamerusStudio.PMBus"
+                    xmlns:components="clr-namespace:ParamerusStudio.Components">
+    
+    <!--#region Static resources-->
+    <!--#region Colors -->
     <SolidColorBrush x:Key="Paramerus.MainColor" Color="#FFC20000"/>
     <SolidColorBrush x:Key="Paramerus.HeaderSplitter" Color="#FFAEAEAE"/>
     <SolidColorBrush x:Key="Paramerus.HeaderButtonBorder" Color="#FF6B7288"/>
@@ -14,7 +16,6 @@
     <SolidColorBrush x:Key="Paramerus.RegisterBitFaultColor" Color="#FFFE0000"/>
     <SolidColorBrush x:Key="Paramerus.RegisterBitWarningColor" Color="#FFFEA400"/>
     
-
     <SolidColorBrush x:Key="Button.Static.Background" Color="#FFDDDDDD"/>
     <SolidColorBrush x:Key="Button.Static.Border" Color="#FF707070"/>
     <SolidColorBrush x:Key="Button.MouseOver.Background" Color="#FFBEE6FD"/>
@@ -24,77 +25,26 @@
     <SolidColorBrush x:Key="Button.Disabled.Background" Color="#FFF4F4F4"/>
     <SolidColorBrush x:Key="Button.Disabled.Border" Color="#FFADB2B5"/>
     <SolidColorBrush x:Key="Button.Disabled.Foreground" Color="#FF838383"/>
-    
+    <!--#endregion-->
+
+    <!--#region Converters -->
+    <components:RegisterStatusTableConverter x:Key="RegStatusTableConverter"/>
+    <components:StatusControlLineToStateIndicButtonConverter x:Key="StatusControlLineConv"/>
+    <components:StatusRegsToIndicatorButtonBacgroundConverter x:Key="StatRegToIndBackgroundConv"/>
+    <components:ReadValueToVisibleConverter x:Key="ReadValToVisibleConv"/>
+    <components:RowCountPanelChartsConverter x:Key="RowCountPanelChartConv"/>
+    <components:ColumnCountPanelChartsConverter x:Key="ColCountPanelChartConv"/>
+    <components:SizePlotsConverter x:Key="SizePlotsConv"/>
+    <components:HeightPlotsConverter x:Key="HeightChartConv"/>
+    <components:StatusRegisterToBackgroundConverter x:Key="SRToTitleBackgroundConverter"/>
+    <components:StatusRegisterToForegroundConverter x:Key="SRToTitleForegroundConverter"/>
+    <components:VisibilityToCheckedConverter x:Key="VisibilityToCheckedConverter"/>
+    <components:AlignmentPlotsConverter x:Key="AlignPlotsConv"/>
+    <components:LimitItemSourceConverter x:Key="LimitItemsConv"/>
+    <!--#endregion-->
+
     <CornerRadius x:Key="Paramerus.CornerRadius" TopLeft="7" TopRight="7" BottomLeft="7" BottomRight="7"/>
-
-    <local:RegisterStatusTableConverter x:Key="RegStatusTableConverter"/>
-    <local:StatusControlLineToStateIndicButtonConverter x:Key="StatusControlLineConv"/>
-    <local:StatusRegsToIndicatorButtonBacgroundConverter x:Key="StatRegToIndBackgroundConv"/>
-    <local:ReadValueToVisibleConverter x:Key="ReadValToVisibleConv"/>
-    <local:RowCountPanelChartsConverter x:Key="RowCountPanelChartConv"/>
-    <local:ColumnCountPanelChartsConverter x:Key="ColCountPanelChartConv"/>
-    <local:SizePlotsConverter x:Key="SizePlotsConv"/>
-    <local:HeightPlotsConverter x:Key="HeightChartConv"/>
-
-    <Style x:Key="ToggleButtonMenuStyle" BasedOn="{StaticResource {x:Type ToggleButton}}" TargetType="RadioButton">
-        <Setter Property="Width" Value="100"/>
-        <Setter Property="BorderBrush" Value="Transparent"/>
-        <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="RadioButton">
-                    <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
-                        <ContentPresenter x:Name="contentPresenter" 
-                                          Focusable="False" 
-                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
-                                          Margin="{TemplateBinding Padding}" 
-                                          RecognizesAccessKey="True" 
-                                          SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
-                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
-                            <ContentPresenter.Content>
-                                <Grid>
-                                    <TextBlock Text="{TemplateBinding Content}"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"
-                                               />
-                                </Grid>
-                                
-                            </ContentPresenter.Content>
-                        </ContentPresenter>
-
-                        
-
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="true">
-                            <Setter Property="Background" Value="{StaticResource Paramerus.HoverBackground}"/>
-                        </Trigger>
-                        <Trigger Property="IsPressed" Value="true">
-                            <Setter Property="IsChecked" Value="true"/>
-                        </Trigger>
-                        <Trigger Property="IsChecked" Value="true">
-                            <Setter Property="Background" Value="{StaticResource Paramerus.MainColor}"/>
-                            <Setter Property="Foreground" Value="White"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-    <Style x:Key="RegisterGridCellBackgroundStyle" TargetType="DataGridCell">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Path=CurrentStatusBit}" Value="Fault">
-                <Setter Property="Background" Value="{StaticResource Paramerus.RegisterBitFaultColor}"/>
-                <Setter Property="Foreground" Value="White"/>
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Path=CurrentStatusBit}" Value="Warning">
-                <Setter Property="Background" Value="{StaticResource Paramerus.RegisterBitWarningColor}"/>
-                <Setter Property="Foreground" Value="Black"/>
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
+    <!--#endregion-->
 
     <Style x:Key="RegisterGridRowBackgroundStyle" TargetType="DataGridRow">
         <Style.Triggers>
@@ -113,7 +63,6 @@
         </Style.Triggers>
     </Style>
 
-   
     <Style x:Key="ParamerusRegisterStatusGroupBoxStylle" TargetType="dxlc:GroupBox">
         <Setter Property="Width" Value="Auto"/>
         <Setter Property="Height" Value="Auto"/>
@@ -122,7 +71,7 @@
         <Setter Property="Padding" Value="0"/>
         <Setter Property="State" Value="Minimized"/>
     </Style>
-    
+
     <Style x:Key="ParamerusRegisterStatusDataGridStyle" TargetType="DataGrid">
         <Setter Property="HeadersVisibility" Value="None"/>
         <Setter Property="Padding" Value="0"/>
@@ -139,253 +88,6 @@
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="RowStyle" Value="{StaticResource RegisterGridRowBackgroundStyle}"/>
     </Style>
-
-    <pmbus:StatusRegisterToBackgroundConverter x:Key="SRToTitleBackgroundConverter"/>
-    <pmbus:StatusRegisterToForegroundConverter x:Key="SRToTitleForegroundConverter"/>
-    <local:VisibilityToCheckedConverter x:Key="VisibilityToCheckedConverter"/>
-    <pmbus:ParamerusRegisterStatus x:Key="Register_STATUS_VOUT">
-        <pmbus:ParamerusRegisterStatus.RegisterBits>
-            <pmbus:ParamerusRegisterBit NameBit="Vout OV Fault"
-                                             CurrentStatusBit="Fault"
-                                             BitNum="7"/>
-            <pmbus:ParamerusRegisterBit NameBit="Vout OV Warning"
-                                             CurrentStatusBit="Warning"
-                                             BitNum="6"/>
-            <pmbus:ParamerusRegisterBit NameBit="Vout UV Warning"
-                                             CurrentStatusBit="BitNotImplemented"
-                                             BitNum="5"/>
-            <pmbus:ParamerusRegisterBit NameBit="Vout UV Fault"
-                                             BitNum="4"/>
-            <pmbus:ParamerusRegisterBit NameBit="VOUT_MAX Warning"
-                                             BitNum="3"/>
-            <pmbus:ParamerusRegisterBit NameBit="TON_MAX Fault"
-                                             BitNum="2"/>
-            <pmbus:ParamerusRegisterBit NameBit="TOFF_MAX Warning"
-                                             BitNum="1"/>
-            <pmbus:ParamerusRegisterBit NameBit="Vout Tracking Error"
-                                             BitNum="0"/>
-        </pmbus:ParamerusRegisterStatus.RegisterBits>
-    </pmbus:ParamerusRegisterStatus>
-    <pmbus:ParamerusRegisterStatus x:Key="Register_STATUS_IOUT">
-        <pmbus:ParamerusRegisterStatus.RegisterBits>
-            <pmbus:ParamerusRegisterBit NameBit="IOUT OV Fault"
-                                             CurrentStatusBit="Warning"
-                                             BitNum="7"/>
-            <pmbus:ParamerusRegisterBit NameBit="IOUT OC Fault with LV Shutdown"
-                                             BitNum="6"/>
-            <pmbus:ParamerusRegisterBit NameBit="IOUT OC Fault"
-                                             BitNum="5"/>
-            <pmbus:ParamerusRegisterBit NameBit="IOUT UC Fault"
-                                             BitNum="4"/>
-            <pmbus:ParamerusRegisterBit NameBit="Current Share Fault"
-                                             BitNum="3"/>
-            <pmbus:ParamerusRegisterBit NameBit="Power Limiting Mode"
-                                             BitNum="2"/>
-            <pmbus:ParamerusRegisterBit NameBit="POUT OP Fault"
-                                             BitNum="1"/>
-            <pmbus:ParamerusRegisterBit NameBit="POUT OP Warning"
-                                             BitNum="0"/>
-        </pmbus:ParamerusRegisterStatus.RegisterBits>
-    </pmbus:ParamerusRegisterStatus>
-    <pmbus:ParamerusRegisterStatus x:Key="Register_STATUS_TEMP">
-        <pmbus:ParamerusRegisterStatus.RegisterBits>
-            <pmbus:ParamerusRegisterBit NameBit="OT Fault"
-                                             BitNum="7"/>
-            <pmbus:ParamerusRegisterBit NameBit="OT Warning"
-                                             BitNum="6"/>
-            <pmbus:ParamerusRegisterBit NameBit="UT Fault"
-                                             BitNum="5"/>
-            <pmbus:ParamerusRegisterBit NameBit="UT Warning"
-                                             BitNum="4"/>
-            <pmbus:ParamerusRegisterBit NameBit="Reserved"
-                                             BitNum="3"/>
-            <pmbus:ParamerusRegisterBit NameBit="Reserved"
-                                             BitNum="2"/>
-            <pmbus:ParamerusRegisterBit NameBit="Reserved"
-                                             BitNum="1"/>
-            <pmbus:ParamerusRegisterBit NameBit="Reserved"
-                                             BitNum="0"/>
-        </pmbus:ParamerusRegisterStatus.RegisterBits>
-    </pmbus:ParamerusRegisterStatus>
-    <pmbus:ParamerusRegisterStatus x:Key="Register_STATUS_CML">
-        <pmbus:ParamerusRegisterStatus.RegisterBits>
-            <pmbus:ParamerusRegisterBit NameBit="Invalid Command"
-                                             BitNum="7"/>
-            <pmbus:ParamerusRegisterBit NameBit="Invalid Data"
-                                             BitNum="6"/>
-            <pmbus:ParamerusRegisterBit NameBit="PEC Fault"
-                                             BitNum="5"/>
-            <pmbus:ParamerusRegisterBit NameBit="Memory Fault"
-                                             BitNum="4"/>
-            <pmbus:ParamerusRegisterBit NameBit="Processor Fault"
-                                             BitNum="3"/>
-            <pmbus:ParamerusRegisterBit NameBit="Reserved"
-                                             BitNum="2"/>
-            <pmbus:ParamerusRegisterBit NameBit="Other Comms Fault"
-                                             BitNum="1"/>
-            <pmbus:ParamerusRegisterBit NameBit="Other Memory/Logic Fault"
-                                             BitNum="0"/>
-        </pmbus:ParamerusRegisterStatus.RegisterBits>
-    </pmbus:ParamerusRegisterStatus>
-    <pmbus:ParamerusRegisterStatus x:Key="Register_STATUS_INPUT">
-        <pmbus:ParamerusRegisterStatus.RegisterBits>
-            <pmbus:ParamerusRegisterBit NameBit="Vin OV Fault"
-                                             BitNum="7"/>
-            <pmbus:ParamerusRegisterBit NameBit="Vin OV Warning"
-                                             BitNum="6"/>
-            <pmbus:ParamerusRegisterBit NameBit="Vin UV Warning"
-                                             BitNum="5"/>
-            <pmbus:ParamerusRegisterBit NameBit="Vin UV Fault"
-                                             BitNum="4"/>
-            <pmbus:ParamerusRegisterBit NameBit="Unit off: Insufficient Vin"
-                                             BitNum="3"/>
-            <pmbus:ParamerusRegisterBit NameBit="IIN OC Fault"
-                                             BitNum="2"/>
-            <pmbus:ParamerusRegisterBit NameBit="IIN OC Warning"
-                                             BitNum="1"/>
-            <pmbus:ParamerusRegisterBit NameBit="PIN OP Warning"
-                                             BitNum="0"/>
-        </pmbus:ParamerusRegisterStatus.RegisterBits>
-    </pmbus:ParamerusRegisterStatus>
-    <pmbus:ParamerusRegisterStatus x:Key="Register_STATUS_Fans_1_2">
-        <pmbus:ParamerusRegisterStatus.RegisterBits>
-            <pmbus:ParamerusRegisterBit NameBit="Fan 1 Fault"
-                                             BitNum="7"/>
-            <pmbus:ParamerusRegisterBit NameBit="Fan 2 Fault"
-                                             BitNum="6"/>
-            <pmbus:ParamerusRegisterBit NameBit="Fan 1 Warning"
-                                             BitNum="5"/>
-            <pmbus:ParamerusRegisterBit NameBit="Fan 2 Warning"
-                                             BitNum="4"/>
-            <pmbus:ParamerusRegisterBit NameBit="Fan 1 Speed Overridden"
-                                             BitNum="3"/>
-            <pmbus:ParamerusRegisterBit NameBit="Fan 2 Speed Overridden"
-                                             BitNum="2"/>
-            <pmbus:ParamerusRegisterBit NameBit="Air Flow Fault"
-                                             BitNum="1"/>
-            <pmbus:ParamerusRegisterBit NameBit="Air Flow Warning"
-                                             BitNum="0"/>
-        </pmbus:ParamerusRegisterStatus.RegisterBits>
-    </pmbus:ParamerusRegisterStatus>
-    <pmbus:ParamerusRegisterStatus x:Key="Register_STATUS_Fans_3_4">
-        <pmbus:ParamerusRegisterStatus.RegisterBits>
-            <pmbus:ParamerusRegisterBit NameBit="Fan 3 Fault"
-                                             BitNum="7"/>
-            <pmbus:ParamerusRegisterBit NameBit="Fan 4 Fault"
-                                             BitNum="6"/>
-            <pmbus:ParamerusRegisterBit NameBit="Fan 3 Warning"
-                                             BitNum="5"/>
-            <pmbus:ParamerusRegisterBit NameBit="Fan 4 Warning"
-                                             BitNum="4"/>
-            <pmbus:ParamerusRegisterBit NameBit="Fan 3 Speed Overridden"
-                                             BitNum="3"/>
-            <pmbus:ParamerusRegisterBit NameBit="Fan 4 Speed Overridden"
-                                             BitNum="2"/>
-            <pmbus:ParamerusRegisterBit NameBit="Reserved"
-                                             BitNum="1"/>
-            <pmbus:ParamerusRegisterBit NameBit="Reserved"
-                                             BitNum="0"/>
-        </pmbus:ParamerusRegisterStatus.RegisterBits>
-    </pmbus:ParamerusRegisterStatus>
-    <pmbus:ParamerusRegisterStatus x:Key="Register_STATUS_MFR_SPECIFIC">
-        <pmbus:ParamerusRegisterStatus.RegisterBits>
-            <pmbus:ParamerusRegisterBit NameBit="Manufacturer 7"
-                                             BitNum="7"/>
-            <pmbus:ParamerusRegisterBit NameBit="Manufacturer 6"
-                                             BitNum="6"/>
-            <pmbus:ParamerusRegisterBit NameBit="Manufacturer 5"
-                                             BitNum="5"/>
-            <pmbus:ParamerusRegisterBit NameBit="Manufacturer 4"
-                                             BitNum="4"/>
-            <pmbus:ParamerusRegisterBit NameBit="Manufacturer 3"
-                                             BitNum="3"/>
-            <pmbus:ParamerusRegisterBit NameBit="Manufacturer 2"
-                                             BitNum="2"/>
-            <pmbus:ParamerusRegisterBit NameBit="Manufacturer 1"
-                                             BitNum="1"/>
-            <pmbus:ParamerusRegisterBit NameBit="Manufacturer 0"
-                                             BitNum="0"/>
-        </pmbus:ParamerusRegisterStatus.RegisterBits>
-    </pmbus:ParamerusRegisterStatus>
-    <pmbus:ParamerusRegisterStatus x:Key="Register_STATUS_OTHER">
-        <pmbus:ParamerusRegisterStatus.RegisterBits>
-            <pmbus:ParamerusRegisterBit NameBit="Reserved"
-                                             BitNum="7"/>
-            <pmbus:ParamerusRegisterBit NameBit="Reserved"
-                                             BitNum="6"/>
-            <pmbus:ParamerusRegisterBit NameBit="Input A fuse rr circuit breaker fault"
-                                             BitNum="5"/>
-            <pmbus:ParamerusRegisterBit NameBit="Input B fuse Or circuit breaker fault"
-                                             BitNum="4"/>
-            <pmbus:ParamerusRegisterBit NameBit="Input A OR-ing device fault"
-                                             BitNum="3"/>
-            <pmbus:ParamerusRegisterBit NameBit="Input B OR-ing device fault"
-                                             BitNum="2"/>
-            <pmbus:ParamerusRegisterBit NameBit="Output OR-ing device fault"
-                                             BitNum="1"/>
-            <pmbus:ParamerusRegisterBit NameBit="Reserved"
-                                             BitNum="0"/>
-        </pmbus:ParamerusRegisterStatus.RegisterBits>
-    </pmbus:ParamerusRegisterStatus>
-    
-    <ControlTemplate x:Key="ParamerusLowItemStyle" TargetType="{x:Type MenuItem}">
-        <Border x:Name="templateRoot" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
-            <Grid Margin="-1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition MinWidth="22" SharedSizeGroup="MenuItemIconColumnGroup" Width="Auto"/>
-                    <ColumnDefinition Width="13"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="30"/>
-                    <ColumnDefinition SharedSizeGroup="MenuItemIGTColumnGroup" Width="Auto"/>
-                    <ColumnDefinition Width="20"/>
-                </Grid.ColumnDefinitions>
-                <ContentPresenter x:Name="Icon" Content="{TemplateBinding Icon}" ContentSource="Icon" HorizontalAlignment="Center" Height="16" Margin="3" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="Center" Width="16"/>
-                <Border x:Name="GlyphPanel" BorderBrush="#FF26A0DA" BorderThickness="1" Background="#3D26A0DA" Height="22" Margin="-1,0,0,0" Visibility="Hidden" VerticalAlignment="Center" Width="22">
-                    <Path x:Name="Glyph" Data="F1M10,1.2L4.7,9.1 4.5,9.1 0,5.2 1.3,3.5 4.3,6.1 8.3,0 10,1.2z" Fill="#FF212121" FlowDirection="LeftToRight" Height="11" Width="9"/>
-                </Border>
-                <ContentPresenter ContentTemplate="{TemplateBinding HeaderTemplate}" Content="{TemplateBinding Header}" Grid.Column="2" ContentStringFormat="{TemplateBinding HeaderStringFormat}" ContentSource="Header" HorizontalAlignment="Left" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="4" Margin="{TemplateBinding Padding}" Opacity="0.7" Text="{TemplateBinding InputGestureText}" VerticalAlignment="Center"/>
-                <Path x:Name="RightArrow" Grid.Column="5" Data="M0,0L4,3.5 0,7z" Fill="#FF212121" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center"/>
-                <Popup x:Name="PART_Popup" AllowsTransparency="True" Focusable="False" HorizontalOffset="-2" IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}" PopupAnimation="{DynamicResource {x:Static SystemParameters.MenuPopupAnimationKey}}" Placement="Right" VerticalOffset="-3">
-                    <Border x:Name="SubMenuBorder" BorderBrush="#FF999999" BorderThickness="1" Background="#FFF0F0F0" Padding="2">
-                        <ScrollViewer x:Name="SubMenuScrollViewer" Style="{DynamicResource {ComponentResourceKey ResourceId=MenuScrollViewer, TypeInTargetAssembly={x:Type FrameworkElement}}}">
-                            <Grid RenderOptions.ClearTypeHint="Enabled">
-                                <Canvas HorizontalAlignment="Left" Height="0" VerticalAlignment="Top" Width="0">
-                                    <Rectangle x:Name="OpaqueRect" Fill="{Binding Background, ElementName=SubMenuBorder}" Height="{Binding ActualHeight, ElementName=SubMenuBorder}" Width="{Binding ActualWidth, ElementName=SubMenuBorder}"/>
-                                </Canvas>
-                                <Rectangle Fill="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" HorizontalAlignment="Left" Margin="29,2,0,2" Width="1"/>
-                                <ItemsPresenter x:Name="ItemsPresenter" KeyboardNavigation.DirectionalNavigation="Cycle" Grid.IsSharedSizeScope="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" KeyboardNavigation.TabNavigation="Cycle"/>
-                            </Grid>
-                        </ScrollViewer>
-                    </Border>
-                </Popup>
-            </Grid>
-        </Border>
-        <ControlTemplate.Triggers>
-            <Trigger Property="IsSuspendingPopupAnimation" Value="True">
-                <Setter Property="PopupAnimation" TargetName="PART_Popup" Value="None"/>
-            </Trigger>
-            <Trigger Property="Icon" Value="{x:Null}">
-                <Setter Property="Visibility" TargetName="Icon" Value="Collapsed"/>
-            </Trigger>
-            <Trigger Property="IsChecked" Value="True">
-                <Setter Property="Visibility" TargetName="GlyphPanel" Value="Visible"/>
-                <Setter Property="Visibility" TargetName="Icon" Value="Collapsed"/>
-            </Trigger>
-            <Trigger Property="IsHighlighted" Value="True">
-                <Setter Property="Background" TargetName="templateRoot" Value="Transparent"/>
-            </Trigger>
-            <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="TextElement.Foreground" TargetName="templateRoot" Value="#FF707070"/>
-                <Setter Property="Fill" TargetName="Glyph" Value="#FF707070"/>
-                <Setter Property="Fill" TargetName="RightArrow" Value="#FF707070"/>
-            </Trigger>
-            <Trigger Property="CanContentScroll" SourceName="SubMenuScrollViewer" Value="False">
-                <Setter Property="Canvas.Top" TargetName="OpaqueRect" Value="{Binding VerticalOffset, ElementName=SubMenuScrollViewer}"/>
-                <Setter Property="Canvas.Left" TargetName="OpaqueRect" Value="{Binding HorizontalOffset, ElementName=SubMenuScrollViewer}"/>
-            </Trigger>
-        </ControlTemplate.Triggers>
-    </ControlTemplate>
 
     <Style x:Key="ParamerusTopItemStyle" TargetType="MenuItem">
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -507,62 +209,9 @@
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
     </Style>
 
-    <local:AlignmentPlotsConverter x:Key="AlignPlotsConv"/>
     <Style x:Key="ParamerusChartPanelCustomStyle" TargetType="local:ParamerusChartPanel">
         <Setter Property="Margin" Value="10,0,5,7"/>
     </Style>
-
-    <Style x:Key="AccordionMenuItemSizeStyle" TargetType="dxa:AccordionItem">
-        <Setter Property="Width" Value="240"/>
-        <Setter Property="Height" Value="40"/>
-        <Setter Property="HorizontalContentAlignment" Value="Center" />
-        <Setter Property="VerticalContentAlignment" Value="Center"/>
-        <Setter Property="Background" Value="Transparent"/>
-    </Style>
-
-    <ControlTemplate x:Key="ChartPanel" TargetType="dxlc:GroupBox">
-        <dx:Container>
-            <Border x:Name="ChartPanelBorder"
-                    BorderThickness="1"
-                    BorderBrush="{StaticResource Paramerus.MainColor}"
-                    CornerRadius="{StaticResource Paramerus.CornerRadius}">
-                <dxlc:LayoutControl dx:DXSerializer.Enabled="False"
-                                    ItemSpace="0"
-                                    Orientation="Vertical"
-                                    Padding="0"
-                                    ScrollBars="None">
-                    <dxlc:LayoutGroup x:Name="Header"
-                                      Background="Transparent"
-                                      ItemSpace="0"
-                                      Padding="2"
-                                      Panel.ZIndex="0"
-                                      Visibility="{TemplateBinding TitleVisibility}">
-                        <Rectangle x:Name="TitleStretcher"
-                                   Visibility="Collapsed"
-                                   Width="0"/>
-                        <dx:DXContentPresenter x:Name="Title"
-                                               Content="{TemplateBinding Header}"
-                                               ContentTemplate="{TemplateBinding HeaderTemplate}"
-                                               Foreground="{TemplateBinding TitleForeground}"
-                                               Margin="9,0"
-                                               VerticalAlignment="Center"/>
-                        <dxlc:GroupBoxButton x:Name="MaximizeElement"
-                                             AutomationProperties.Name="Maximize"
-                                             HorizontalAlignment="Right"
-                                             Margin="2,0,0,0"
-                                             VerticalAlignment="Center"
-                                             Visibility="{TemplateBinding MaximizeElementVisibility}"/>
-                    </dxlc:LayoutGroup>
-                   
-                    <dx:DXContentPresenter x:Name="Content"
-                                           Content="{TemplateBinding Content}"
-                                           ContentTemplate="{TemplateBinding CurrentContentTemplate}"
-                                           Foreground="{TemplateBinding TitleForeground}"
-                                           Margin="{TemplateBinding Padding}"/>
-                </dxlc:LayoutControl>
-            </Border>
-        </dx:Container>
-    </ControlTemplate>
 
     <Style x:Key="ParamerusBorderStyle" TargetType="Border">
         <Setter Property="BorderThickness" Value="1"/>

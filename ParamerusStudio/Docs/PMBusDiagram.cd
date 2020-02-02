@@ -50,13 +50,24 @@
     </TypeIdentifier>
   </Class>
   <Class Name="ParamerusStudio.PMBus.Commands.PMBusReadCommand">
-    <Position X="6" Y="1" Width="1.5" />
+    <Position X="6" Y="1" Width="2.5" />
+    <AssociationLine Name="dev" Type="ParamerusStudio.PMBus.ParamerusPMBusDevice" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="8.5" Y="2.25" />
+        <Point X="10.438" Y="2.25" />
+        <Point X="10.438" Y="1.562" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.911" Y="0.445" />
+      </MemberNameLabel>
+    </AssociationLine>
     <TypeIdentifier>
       <HashCode>BAABAAAAAAAgAAAgAAABgAAAAAAAAAIAAAAABAAAAAA=</HashCode>
       <FileName>PMBus\Commands\PMCommand.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
       <Field Name="command_code" />
+      <Field Name="dev" />
     </ShowAsAssociation>
     <Lollipop Position="0.2" />
   </Class>
@@ -155,7 +166,7 @@
       </MemberNameLabel>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AAQCBCCBBA0kUgEsIQAMkMBDxAkAkhMSBAACDAgQAEA=</HashCode>
+      <HashCode>AAYCBCCBBA0kUgEsIQAMkMBDxAkAkhMSBAACDAgQAEA=</HashCode>
       <FileName>PMBus\ParamerusPMBusDevice.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -174,11 +185,11 @@
     </ShowAsCollectionAssociation>
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
-  <Class Name="ParamerusStudio.PMBus.ParamerusRegisterBit" Collapsed="true" BaseTypeListCollapsed="true">
+  <Class Name="ParamerusStudio.PMBus.ParamerusRegisterBit" BaseTypeListCollapsed="true">
     <Position X="15.5" Y="5.75" Width="1.75" />
     <AssociationLine Name="CurrentStatusBit" Type="ParamerusStudio.PMBus.BitStatus">
       <MemberNameLabel ManuallyPlaced="true">
-        <Position X="0.881" Y="1.966" />
+        <Position X="0.725" Y="3.356" />
       </MemberNameLabel>
     </AssociationLine>
     <TypeIdentifier>
@@ -214,51 +225,15 @@
     </ShowAsCollectionAssociation>
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
-  <Class Name="ParamerusStudio.MainWindow" BaseTypeListCollapsed="true">
-    <Position X="12" Y="5.5" Width="1.5" />
-    <AssociationLine Name="PMBusDevices" Type="ParamerusStudio.PMBus.ParamerusPMBusDevice" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
-      <Path>
-        <Point X="12.625" Y="5.5" />
-        <Point X="12.625" Y="4.609" />
-        <Point X="11.25" Y="4.609" />
-        <Point X="11.25" Y="1.562" />
-      </Path>
-      <MemberNameLabel ManuallyPlaced="true">
-        <Position X="-1.174" Y="2.745" />
-      </MemberNameLabel>
-    </AssociationLine>
-    <AssociationLine Name="CurrentPmBusDevice" Type="ParamerusStudio.PMBus.ParamerusPMBusDevice" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
-      <Path>
-        <Point X="12.188" Y="5.5" />
-        <Point X="12.188" Y="5.112" />
-        <Point X="10.688" Y="5.112" />
-        <Point X="10.688" Y="1.562" />
-      </Path>
-      <MemberNameLabel ManuallyPlaced="true">
-        <Position X="-1.605" Y="3.272" />
-      </MemberNameLabel>
-    </AssociationLine>
-    <TypeIdentifier>
-      <HashCode>AAARABAAAQAAAAQAIAAAAABAwAAAACAAAAkAAAgAAAA=</HashCode>
-      <FileName>MainWindow.xaml.cs</FileName>
-    </TypeIdentifier>
-    <ShowAsAssociation>
-      <Property Name="CurrentPmBusDevice" />
-    </ShowAsAssociation>
-    <ShowAsCollectionAssociation>
-      <Property Name="PMBusDevices" />
-    </ShowAsCollectionAssociation>
-    <Lollipop Position="0.2" Collapsed="true" />
-  </Class>
   <Interface Name="ParamerusStudio.PMBus.Commands.IPMBusReadCommand">
-    <Position X="3.5" Y="0.5" Width="2" />
+    <Position X="3.75" Y="0.5" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
-      <FileName>PMBus\Commands\IPMCommand.cs</FileName>
+      <FileName>PMBus\Commands\IPMBusReadCommand.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Enum Name="ParamerusStudio.PMBus.PMBusMode" Collapsed="true">
-    <Position X="1.75" Y="0.5" Width="1.5" />
+    <Position X="0.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgA=</HashCode>
       <FileName>PMBus\ParamerusPMBusDevice.cs</FileName>

@@ -286,12 +286,14 @@
                                                       Grid.Column="1" 
                                                       HorizontalContentAlignment="Center"/>
                                        
-                                        <CheckBox Content="Warning level"
+                                        <CheckBox Name="cbShowWarnLimits" 
+                                                  Content="Warning level"
                                                       HorizontalAlignment="Left"
                                                       Margin="8,0,0,4"
                                                       Grid.Row="1" 
                                                       Grid.Column="0"/>
-                                        <CheckBox Content="Fault level" 
+                                        <CheckBox Name="cbShowFaultLimits" 
+                                                  Content="Fault level" 
                                                       HorizontalAlignment="Left"
                                                       Margin="0,0,0,4"
                                                       Grid.Row="1" 
@@ -790,6 +792,8 @@
                                     </MultiBinding>
                                 </UniformGrid.Rows>
                                 <local:ParamerusChartPanel x:Name="VinChartPanel"
+                                                           ShowWarnLimits="{Binding ElementName=cbShowWarnLimits, Path=IsChecked}"
+                                                           ShowFaultLimits="{Binding ElementName=cbShowFaultLimits, Path=IsChecked}"
                                                            IntervalReading="{Binding ElementName=PeriodReadingCharts,Path=Value}"
                                                            LastValue="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_vin}"
                                                            Device="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
@@ -797,8 +801,14 @@
                                                            Style="{StaticResource ParamerusChartPanelCustomStyle}"
                                                            VisibleLimitsPanel="{Binding ElementName=cbShowWarningFaultLimits, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                                            VisibleValuesSeriesLabel="{Binding ElementName=cbShowValueLabelPlots, Path=IsChecked}"
-                                                           MouseMove="VinChartPanel_MouseMove"
                                                            NamePanel="Vin - Input Voltage">
+                                    <local:ParamerusChartPanel.LimitsItemSource>
+                                        <MultiBinding Converter="{StaticResource LimitItemsConv}" 
+                                                      ConverterParameter="0">
+                                            <Binding ElementName="mainWindow" Path="CurrentPmBusDevice.VOUT_Limits"/>
+                                            <Binding ElementName="mainWindow" Path="CurrentPmBusDevice"/>
+                                        </MultiBinding>
+                                    </local:ParamerusChartPanel.LimitsItemSource>
                                     <local:ParamerusChartPanel.Width>
                                         <MultiBinding Converter="{StaticResource SizePlotsConv}">
                                             <Binding ElementName="rbScalePlot" Path="IsChecked"/>
@@ -813,6 +823,8 @@
                                     </local:ParamerusChartPanel.Height>
                                 </local:ParamerusChartPanel>
                                 <local:ParamerusChartPanel x:Name="VoutChartPanel"
+                                                           ShowWarnLimits="{Binding ElementName=cbShowWarnLimits, Path=IsChecked}"
+                                                           ShowFaultLimits="{Binding ElementName=cbShowFaultLimits, Path=IsChecked}"
                                                                IntervalReading="{Binding ElementName=PeriodReadingCharts,Path=Value}"
                                                                VisibleValuesSeriesLabel="{Binding ElementName=cbShowValueLabelPlots, Path=IsChecked}"
                                                                LastValue="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_vout}"
@@ -821,6 +833,12 @@
                                                                VisibleLimitsPanel="{Binding ElementName=cbShowWarningFaultLimits, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                                                Style="{StaticResource ParamerusChartPanelCustomStyle}"
                                                                NamePanel="Vout - Output Voltage">
+                                    <local:ParamerusChartPanel.LimitsItemSource>
+                                        <MultiBinding Converter="{StaticResource LimitItemsConv}" ConverterParameter="1">
+                                            <Binding ElementName="mainWindow" Path="CurrentPmBusDevice.VOUT_Limits"/>
+                                            <Binding ElementName="mainWindow" Path="CurrentPmBusDevice"/>
+                                        </MultiBinding>
+                                    </local:ParamerusChartPanel.LimitsItemSource>
                                     <local:ParamerusChartPanel.Width>
                                         <MultiBinding Converter="{StaticResource SizePlotsConv}">
                                             <Binding ElementName="rbScalePlot" Path="IsChecked"/>
@@ -835,6 +853,8 @@
                                     </local:ParamerusChartPanel.Height>
                                 </local:ParamerusChartPanel>
                                 <local:ParamerusChartPanel x:Name="IoutChartPanel" 
+                                                           ShowWarnLimits="{Binding ElementName=cbShowWarnLimits, Path=IsChecked}"
+                                                           ShowFaultLimits="{Binding ElementName=cbShowFaultLimits, Path=IsChecked}"
                                                            IntervalReading="{Binding ElementName=PeriodReadingCharts,Path=Value}"
                                                            VisibleValuesSeriesLabel="{Binding ElementName=cbShowValueLabelPlots, Path=IsChecked}"
                                                            LastValue="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_iout}"
@@ -843,6 +863,13 @@
                                                            VisibleLimitsPanel="{Binding ElementName=cbShowWarningFaultLimits, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                                            Style="{StaticResource ParamerusChartPanelCustomStyle}"
                                                            NamePanel="Iout - Output Current">
+                                    <local:ParamerusChartPanel.LimitsItemSource>
+                                        <MultiBinding Converter="{StaticResource LimitItemsConv}" 
+                                                      ConverterParameter="2">
+                                            <Binding ElementName="mainWindow" Path="CurrentPmBusDevice.VOUT_Limits"/>
+                                            <Binding ElementName="mainWindow" Path="CurrentPmBusDevice"/>
+                                        </MultiBinding>
+                                    </local:ParamerusChartPanel.LimitsItemSource>
                                     <local:ParamerusChartPanel.Width>
                                         <MultiBinding Converter="{StaticResource SizePlotsConv}">
                                             <Binding ElementName="rbScalePlot" Path="IsChecked"/>
@@ -857,6 +884,8 @@
                                     </local:ParamerusChartPanel.Height>
                                 </local:ParamerusChartPanel>
                                 <local:ParamerusChartPanel x:Name="PoutChartPanel"  
+                                                           ShowWarnLimits="{Binding ElementName=cbShowWarnLimits, Path=IsChecked}"
+                                                           ShowFaultLimits="{Binding ElementName=cbShowFaultLimits, Path=IsChecked}"
                                                            IntervalReading="{Binding ElementName=PeriodReadingCharts,Path=Value}"
                                                            VisibleValuesSeriesLabel="{Binding ElementName=cbShowValueLabelPlots, Path=IsChecked}"
                                                            Device="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
@@ -865,50 +894,13 @@
                                                            VisibleLimitsPanel="{Binding ElementName=cbShowWarningFaultLimits, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                                            Style="{StaticResource ParamerusChartPanelCustomStyle}"
                                                            NamePanel="Pout(calc) - Output Power">
-                                    <local:ParamerusChartPanel.Width>
-                                        <MultiBinding Converter="{StaticResource SizePlotsConv}">
-                                            <Binding ElementName="rbScalePlot" Path="IsChecked"/>
-                                            <Binding ElementName="tbPlotWidth" Path="Value"/>
+                                    <local:ParamerusChartPanel.LimitsItemSource>
+                                        <MultiBinding Converter="{StaticResource LimitItemsConv}" 
+                                                      ConverterParameter="3">
+                                            <Binding ElementName="mainWindow" Path="CurrentPmBusDevice.VOUT_Limits"/>
+                                            <Binding ElementName="mainWindow" Path="CurrentPmBusDevice"/>
                                         </MultiBinding>
-                                    </local:ParamerusChartPanel.Width>
-                                    <local:ParamerusChartPanel.Height>
-                                        <MultiBinding Converter="{StaticResource SizePlotsConv}">
-                                            <Binding ElementName="rbScalePlot" Path="IsChecked"/>
-                                            <Binding ElementName="tbPlotHeight" Path="Value"/>
-                                        </MultiBinding>
-                                    </local:ParamerusChartPanel.Height>
-                                </local:ParamerusChartPanel>
-                                <local:ParamerusChartPanel x:Name="IntTempChartPanel" 
-                                                           IntervalReading="{Binding ElementName=PeriodReadingCharts,Path=Value}"
-                                                           VisibleValuesSeriesLabel="{Binding ElementName=cbShowValueLabelPlots, Path=IsChecked}"
-                                                           LastValue="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_temp_int}"
-                                                           Device="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
-                                                           TimerPeriod="{Binding ElementName=tbRollingRate, Path=Value}"
-                                                           VisibleLimitsPanel="{Binding ElementName=cbShowWarningFaultLimits, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                                           Style="{StaticResource ParamerusChartPanelCustomStyle}"
-                                                           NamePanel="Temp Int - Temperature Internal">
-                                    <local:ParamerusChartPanel.Width>
-                                        <MultiBinding Converter="{StaticResource SizePlotsConv}">
-                                            <Binding ElementName="rbScalePlot" Path="IsChecked"/>
-                                            <Binding ElementName="tbPlotWidth" Path="Value"/>
-                                        </MultiBinding>
-                                    </local:ParamerusChartPanel.Width>
-                                    <local:ParamerusChartPanel.Height>
-                                        <MultiBinding Converter="{StaticResource SizePlotsConv}">
-                                            <Binding ElementName="rbScalePlot" Path="IsChecked"/>
-                                            <Binding ElementName="tbPlotHeight" Path="Value"/>
-                                        </MultiBinding>
-                                    </local:ParamerusChartPanel.Height>
-                                </local:ParamerusChartPanel>
-                                <local:ParamerusChartPanel x:Name="ExtTempChartPanel" 
-                                                           IntervalReading="{Binding ElementName=PeriodReadingCharts,Path=Value}"
-                                                           VisibleValuesSeriesLabel="{Binding ElementName=cbShowValueLabelPlots, Path=IsChecked}"
-                                                           LastValue="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_temp_ext}"
-                                                           Device="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
-                                                           TimerPeriod="{Binding ElementName=tbRollingRate, Path=Value}"
-                                                           VisibleLimitsPanel="{Binding ElementName=cbShowWarningFaultLimits, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                                           Style="{StaticResource ParamerusChartPanelCustomStyle}"
-                                                           NamePanel="Temp Ext - Temperature External">
+                                    </local:ParamerusChartPanel.LimitsItemSource>
                                     <local:ParamerusChartPanel.Width>
                                         <MultiBinding Converter="{StaticResource SizePlotsConv}">
                                             <Binding ElementName="rbScalePlot" Path="IsChecked"/>
@@ -923,6 +915,8 @@
                                     </local:ParamerusChartPanel.Height>
                                 </local:ParamerusChartPanel>
                                 <local:ParamerusChartPanel x:Name="AllTempChartPanel" 
+                                                           ShowWarnLimits="{Binding ElementName=cbShowWarnLimits, Path=IsChecked}"
+                                                           ShowFaultLimits="{Binding ElementName=cbShowFaultLimits, Path=IsChecked}"
                                                            IntervalReading="{Binding ElementName=PeriodReadingCharts,Path=Value}"
                                                            VisibleValuesSeriesLabel="{Binding ElementName=cbShowValueLabelPlots, Path=IsChecked}"
                                                            Device="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice}"
@@ -930,6 +924,13 @@
                                                            VisibleLimitsPanel="{Binding ElementName=cbShowWarningFaultLimits, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                                            Style="{StaticResource ParamerusChartPanelCustomStyle}"
                                                            NamePanel="All Temp - All Temperatures">
+                                    <local:ParamerusChartPanel.LimitsItemSource>
+                                        <MultiBinding Converter="{StaticResource LimitItemsConv}" 
+                                                      ConverterParameter="4">
+                                            <Binding ElementName="mainWindow" Path="CurrentPmBusDevice.VOUT_Limits"/>
+                                            <Binding ElementName="mainWindow" Path="CurrentPmBusDevice"/>
+                                        </MultiBinding>
+                                    </local:ParamerusChartPanel.LimitsItemSource>
                                     <local:ParamerusChartPanel.Width>
                                         <MultiBinding Converter="{StaticResource SizePlotsConv}">
                                             <Binding ElementName="rbScalePlot" Path="IsChecked"/>
@@ -944,6 +945,8 @@
                                     </local:ParamerusChartPanel.Height>
                                 </local:ParamerusChartPanel>
                                 <local:ParamerusChartPanel x:Name="FreqChartPanel" 
+                                                           ShowWarnLimits="{Binding ElementName=cbShowWarnLimits, Path=IsChecked}"
+                                                           ShowFaultLimits="{Binding ElementName=cbShowFaultLimits, Path=IsChecked}"
                                                            IntervalReading="{Binding ElementName=PeriodReadingCharts,Path=Value}"
                                                            VisibleValuesSeriesLabel="{Binding ElementName=cbShowValueLabelPlots, Path=IsChecked}"
                                                            LastValue="{Binding ElementName=mainWindow, Path=CurrentPmBusDevice.Read_freq}"
@@ -952,6 +955,13 @@
                                                            VisibleLimitsPanel="{Binding ElementName=cbShowWarningFaultLimits, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                                            Style="{StaticResource ParamerusChartPanelCustomStyle}"
                                                            NamePanel="Freq - Frequency">
+                                    <local:ParamerusChartPanel.LimitsItemSource>
+                                        <MultiBinding Converter="{StaticResource LimitItemsConv}" 
+                                                      ConverterParameter="5">
+                                            <Binding ElementName="mainWindow" Path="CurrentPmBusDevice.VOUT_Limits"/>
+                                            <Binding ElementName="mainWindow" Path="CurrentPmBusDevice"/>
+                                        </MultiBinding>
+                                    </local:ParamerusChartPanel.LimitsItemSource>
                                     <local:ParamerusChartPanel.Width>
                                         <MultiBinding Converter="{StaticResource SizePlotsConv}">
                                             <Binding ElementName="rbScalePlot" Path="IsChecked"/>

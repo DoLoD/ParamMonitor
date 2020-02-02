@@ -1,7 +1,10 @@
-﻿using ParamerusStudio.PMBus.Commands;
+﻿using ParamerusStudio.Components;
+using ParamerusStudio.PMBus.Commands;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -84,11 +87,47 @@ namespace ParamerusStudio.PMBus
         READ_FREQ = 0x95,
         READ_POUT = 0x96,
     }
+    public enum PMBusLimitType
+    {
+        Warning,
+        Fault
+    }
+
+    public class Limit : INotifyPropertyChanged
+    {
+        private ushort? _value = 0;
+        public PMBusCode Code_limit { get; set; }
+        public PMBusLimitType LimitType { get; set; }
+        public ushort? Value 
+        {
+            get => _value;
+            set
+            {
+                if (_value != value)
+                {
+                    _value = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public Limit(PMBusCode _code, PMBusLimitType _type)
+        {
+            Code_limit = _code;
+            LimitType = _type;
+        }
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void OnPropertyChanged([CallerMemberName]String name ="")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+    }
     /// <summary>
     /// Класс, описывающий PMBus устройство
     /// </summary>
     public class ParamerusPMBusDevice : INotifyPropertyChanged
     {
+
         #region Static Methods
 
         /// <summary>
@@ -143,8 +182,16 @@ namespace ParamerusStudio.PMBus
         #endregion
 
         #region Properties
+        private List<PMBusCode> ConstantlyUpdatetCommands;
+        private List<PMBusCode> OnceExecutedCommands;
+        private Dictionary<PMBusCode, PMBusCommandBase> pmbus_commands;
         private Task updateTask = null;
-        private List<PMBusReadCommand> read_commands;
+        private CancellationTokenSource stopUpdateTask;
+        public ObservableDictionary<PMBusCode, Limit> VIN_Limits { get; set; }
+        public ObservableDictionary<PMBusCode, Limit> VOUT_Limits { get; set; }
+        public ObservableDictionary<PMBusCode, Limit> IOUT_Limits { get; set; }
+        public ObservableDictionary<PMBusCode, Limit> POUT_Limits { get; set; }
+        public ObservableDictionary<PMBusCode, Limit> TEMP_Limits { get; set; }
         #region Status registers
         private ParamerusRegisterStatus _status_VOUT;
         private ParamerusRegisterStatus _status_IOUT;
@@ -487,21 +534,151 @@ namespace ParamerusStudio.PMBus
         }
         private void InitReadCommands()
         {
-            read_commands = new List<PMBusReadCommand>();
-            read_commands.Add(new ReadVoutCommand(this.Device, ((e) => Read_vout = (double?)e),
-                                                              (() => Read_vout == null)));
-            read_commands.Add(new ReadIoutCommand(this.Device, ((e) => Read_iout = (double?)e),
-                                                              (() => Read_iout == null)));
-            read_commands.Add(new ReadVinCommand(this.Device, ((e) => Read_vin = (double?)e),
-                                                              (() => Read_vin == null)));
-            read_commands.Add(new ReadIinCommand(this.Device, ((e) => Read_iin = (double?)e),
-                                                              (() => Read_iin != null)));
-            read_commands.Add(new ReadTemp1Command(this.Device, ((e) => Read_temp_int = (double?)e),
-                                                              (() => Read_temp_int == null)));
-            read_commands.Add(new ReadTemp2Command(this.Device, ((e) => Read_temp_ext = (double?)e),
-                                                              (() => Read_temp_ext == null)));
-            read_commands.Add(new ReadFreqCommand(this.Device, ((e) => Read_freq = (double?)e),
-                                                              (() => Read_freq == null)));
+            ConstantlyUpdatetCommands = new List<PMBusCode>();
+            ConstantlyUpdatetCommands.Add(PMBusCode.READ_VOUT);
+            ConstantlyUpdatetCommands.Add(PMBusCode.READ_IOUT);
+            ConstantlyUpdatetCommands.Add(PMBusCode.READ_VIN);
+            ConstantlyUpdatetCommands.Add(PMBusCode.READ_IIN);
+            ConstantlyUpdatetCommands.Add(PMBusCode.READ_TEMP_1);
+            ConstantlyUpdatetCommands.Add(PMBusCode.READ_TEMP_2);
+            ConstantlyUpdatetCommands.Add(PMBusCode.READ_FREQ);
+
+            ConstantlyUpdatetCommands.Add(PMBusCode.STATUS_VOUT);
+            ConstantlyUpdatetCommands.Add(PMBusCode.STATUS_IOUT);
+            ConstantlyUpdatetCommands.Add(PMBusCode.STATUS_TEMP);
+            ConstantlyUpdatetCommands.Add(PMBusCode.STATUS_CML);
+            ConstantlyUpdatetCommands.Add(PMBusCode.STATUS_INPUT);
+            ConstantlyUpdatetCommands.Add(PMBusCode.STATUS_FANS_1_2);
+            ConstantlyUpdatetCommands.Add(PMBusCode.STATUS_FANS_3_4);
+            ConstantlyUpdatetCommands.Add(PMBusCode.STATUS_MFR_SPECIFIC);
+            ConstantlyUpdatetCommands.Add(PMBusCode.STATUS_OTHER);
+        }
+        private void InitPMBusCommands()
+        {
+            pmbus_commands = new Dictionary<PMBusCode, PMBusCommandBase>();
+            pmbus_commands.Add(PMBusCode.READ_VOUT, new ReadVoutCommand(this, ((e) => Read_vout = (double?)e)));
+            pmbus_commands.Add(PMBusCode.READ_IOUT, new ReadIoutCommand(this, ((e) => Read_iout = (double?)e)));
+            pmbus_commands.Add(PMBusCode.READ_VIN, new ReadVinCommand(this, ((e) => Read_vin = (double?)e)));
+            pmbus_commands.Add(PMBusCode.READ_IIN, new ReadIinCommand(this, ((e) => Read_iin = (double?)e)));
+            pmbus_commands.Add(PMBusCode.READ_TEMP_1, new ReadTemp1Command(this, ((e) => Read_temp_int = (double?)e)));
+            pmbus_commands.Add(PMBusCode.READ_TEMP_2, new ReadTemp2Command(this, ((e) => Read_temp_ext = (double?)e)));
+            pmbus_commands.Add(PMBusCode.READ_FREQ, new ReadFreqCommand(this, ((e) => Read_freq = (double?)e)));
+
+            pmbus_commands.Add(PMBusCode.STATUS_VOUT, new StatusVOUTCommand(this, ((e) => Status_VOUT.RegisterValue = (byte?)e)));
+            pmbus_commands.Add(PMBusCode.STATUS_IOUT, new StatusIOUTCommand(this, ((e) => Status_IOUT.RegisterValue = (byte?)e)));
+            pmbus_commands.Add(PMBusCode.STATUS_TEMP, new StatusTempCommand(this, ((e) => Status_TEMP.RegisterValue = (byte?)e)));
+            pmbus_commands.Add(PMBusCode.STATUS_CML, new StatusCMLCommand(this, ((e) => Status_CML.RegisterValue = (byte?)e)));
+            pmbus_commands.Add(PMBusCode.STATUS_INPUT, new StatusINPUTCommand(this, ((e) => Status_INPUT.RegisterValue = (byte?)e)));
+            pmbus_commands.Add(PMBusCode.STATUS_FANS_1_2, new StatusFANS12Command(this, ((e) => Status_Fans_1_2.RegisterValue = (byte?)e)));
+            pmbus_commands.Add(PMBusCode.STATUS_FANS_3_4, new StatusFANS34Command(this, ((e) => Status_Fans_3_4.RegisterValue = (byte?)e)));
+            pmbus_commands.Add(PMBusCode.STATUS_MFR_SPECIFIC, new StatusMFRSpecificCommand(this, ((e) => Status_Mfr_Specific.RegisterValue = (byte?)e)));
+            pmbus_commands.Add(PMBusCode.STATUS_OTHER, new StatusOTHERCommand(this, ((e) => Status_Other.RegisterValue = (byte?)e)));
+
+            pmbus_commands.Add(PMBusCode.VIN_OV_FAULT_LIMIT, new VinOVFaultLimitCommand(this, ((e) => VIN_Limits[PMBusCode.VIN_OV_FAULT_LIMIT].Value = (ushort?)e)));
+            pmbus_commands.Add(PMBusCode.VIN_OV_FAULT_RESPONSE, new VinOVFaultResponeCommand(this, ((e) => VIN_Limits[PMBusCode.VIN_OV_FAULT_RESPONSE].Value = (ushort?)e)));
+            pmbus_commands.Add(PMBusCode.VIN_OV_WARN_LIMIT, new VinOVWarnLimitCommand(this, ((e) => VIN_Limits[PMBusCode.VIN_OV_WARN_LIMIT].Value = (ushort?)e)));
+            pmbus_commands.Add(PMBusCode.VIN_UV_WARN_LIMIT, new VinUVWarnLimitCommand(this, ((e) => VIN_Limits[PMBusCode.VIN_UV_WARN_LIMIT].Value = (ushort?)e)));
+            pmbus_commands.Add(PMBusCode.VIN_UV_FAULT_LIMIT, new VinUVFaultLimitCommand(this, ((e) => VIN_Limits[PMBusCode.VIN_UV_FAULT_LIMIT].Value = (ushort?)e)));
+            pmbus_commands.Add(PMBusCode.VIN_UV_FAULT_RESPONSE, new VinUVFaultResponceCommand(this, ((e) => VIN_Limits[PMBusCode.VIN_UV_FAULT_RESPONSE].Value = (ushort?)e)));
+
+            pmbus_commands.Add(PMBusCode.VOUT_OV_FAULT_LIMIT, new VoutOVFaultLimitCommand(this, ((e) => VOUT_Limits[PMBusCode.VOUT_OV_FAULT_LIMIT].Value = Convert.ToUInt16(e))));
+            pmbus_commands.Add(PMBusCode.VOUT_OV_FAULT_RESPONSE, new VoutOVFaultResponceCommand(this, ((e) => VOUT_Limits[PMBusCode.VOUT_OV_FAULT_RESPONSE].Value = Convert.ToUInt16(e))));
+            pmbus_commands.Add(PMBusCode.VOUT_OV_WARN_LIMIT, new VoutOVWarnLimitCommand(this, ((e) => VOUT_Limits[PMBusCode.VOUT_OV_WARN_LIMIT].Value = Convert.ToUInt16(e))));
+            pmbus_commands.Add(PMBusCode.VOUT_UV_WARN_LIMIT, new VoutUVWarnLimitCommand(this, ((e) => VOUT_Limits[PMBusCode.VOUT_UV_WARN_LIMIT].Value = Convert.ToUInt16(e))));
+            pmbus_commands.Add(PMBusCode.VOUT_UV_FAULT_LIMIT, new VoutUVFaultLimitCommand(this, ((e) => VOUT_Limits[PMBusCode.VOUT_UV_FAULT_LIMIT].Value = Convert.ToUInt16(e))));
+            pmbus_commands.Add(PMBusCode.VOUT_UV_FAULT_RESPONS, new VoutUVFaultResponceCommand(this, ((e) => VOUT_Limits[PMBusCode.VOUT_UV_FAULT_RESPONS].Value = Convert.ToUInt16(e))));
+
+            pmbus_commands.Add(PMBusCode.IOUT_OC_FAULT_LIMIT, new IoutOCFaultLimitCommand(this, ((e) => IOUT_Limits[PMBusCode.IOUT_OC_FAULT_LIMIT].Value = Convert.ToUInt16(e))));
+            pmbus_commands.Add(PMBusCode.IOUT_OC_FAULT_RESPONSE, new IoutOCFaultResponseCommand(this, ((e) => IOUT_Limits[PMBusCode.IOUT_OC_FAULT_RESPONSE].Value = Convert.ToUInt16(e))));
+            pmbus_commands.Add(PMBusCode.IOUT_OC_WARN_LIMIT, new IoutOCWarnLimitCommand(this, ((e) => IOUT_Limits[PMBusCode.IOUT_OC_WARN_LIMIT].Value = Convert.ToUInt16(e))));
+
+            pmbus_commands.Add(PMBusCode.POUT_OP_FAULT_LIMIT, new PoutOPFaultLimitCommand(this, ((e) => POUT_Limits[PMBusCode.POUT_OP_FAULT_LIMIT].Value = Convert.ToUInt16(e))));
+            pmbus_commands.Add(PMBusCode.POUT_OP_WARN_LIMIT, new PoutOPWarnLimitCommand(this, ((e) => POUT_Limits[PMBusCode.POUT_OP_WARN_LIMIT].Value = Convert.ToUInt16(e))));
+
+            pmbus_commands.Add(PMBusCode.OT_FAULT_LIMIT, new OTFaultLimitCommand(this, ((e) => TEMP_Limits[PMBusCode.OT_FAULT_LIMIT].Value = Convert.ToUInt16(e))));
+            pmbus_commands.Add(PMBusCode.OT_FAULT_RESPONSE, new OTFaultResponseCommand(this, ((e) => TEMP_Limits[PMBusCode.OT_FAULT_RESPONSE].Value = Convert.ToUInt16(e))));
+            pmbus_commands.Add(PMBusCode.OT_WARN_LIMIT, new OTWarnLimitCommand(this, ((e) => TEMP_Limits[PMBusCode.OT_WARN_LIMIT].Value = Convert.ToUInt16(e))));
+            pmbus_commands.Add(PMBusCode.UT_WARN_LIMIT, new UTWarnLimitCommand(this, ((e) => TEMP_Limits[PMBusCode.UT_WARN_LIMIT].Value = Convert.ToUInt16(e))));
+            pmbus_commands.Add(PMBusCode.UT_FAULT_LIMIT, new UTFaultLimitCommand(this, ((e) => TEMP_Limits[PMBusCode.UT_FAULT_LIMIT].Value = Convert.ToUInt16(e))));
+            pmbus_commands.Add(PMBusCode.UT_FAULT_RESPONSE, new UTFaultResponseCommand(this, ((e) => TEMP_Limits[PMBusCode.UT_FAULT_RESPONSE].Value = Convert.ToUInt16(e))));
+        }
+        private void InitOnceExecutedCommands()
+        {
+            OnceExecutedCommands = new List<PMBusCode>();
+            OnceExecutedCommands.Add(PMBusCode.VIN_OV_FAULT_LIMIT);
+            OnceExecutedCommands.Add(PMBusCode.VIN_OV_FAULT_RESPONSE);
+            OnceExecutedCommands.Add(PMBusCode.VIN_OV_WARN_LIMIT);
+            OnceExecutedCommands.Add(PMBusCode.VIN_UV_WARN_LIMIT);
+            OnceExecutedCommands.Add(PMBusCode.VIN_UV_FAULT_LIMIT);
+            OnceExecutedCommands.Add(PMBusCode.VIN_UV_FAULT_RESPONSE);
+            OnceExecutedCommands.Add(PMBusCode.VOUT_OV_FAULT_LIMIT);
+            OnceExecutedCommands.Add(PMBusCode.VOUT_OV_FAULT_RESPONSE);
+            OnceExecutedCommands.Add(PMBusCode.VOUT_OV_WARN_LIMIT);
+            OnceExecutedCommands.Add(PMBusCode.VOUT_UV_WARN_LIMIT);
+            OnceExecutedCommands.Add(PMBusCode.VOUT_UV_FAULT_LIMIT);
+            OnceExecutedCommands.Add(PMBusCode.VOUT_UV_FAULT_RESPONS);
+            OnceExecutedCommands.Add(PMBusCode.IOUT_OC_FAULT_LIMIT);
+            OnceExecutedCommands.Add(PMBusCode.IOUT_OC_FAULT_RESPONSE);
+            OnceExecutedCommands.Add(PMBusCode.IOUT_OC_WARN_LIMIT);
+            OnceExecutedCommands.Add(PMBusCode.POUT_OP_FAULT_LIMIT);
+            OnceExecutedCommands.Add(PMBusCode.POUT_OP_WARN_LIMIT);
+            OnceExecutedCommands.Add(PMBusCode.OT_FAULT_LIMIT);
+            OnceExecutedCommands.Add(PMBusCode.OT_FAULT_RESPONSE);
+            OnceExecutedCommands.Add(PMBusCode.OT_WARN_LIMIT);
+            OnceExecutedCommands.Add(PMBusCode.UT_WARN_LIMIT);
+            OnceExecutedCommands.Add(PMBusCode.UT_FAULT_LIMIT);
+            OnceExecutedCommands.Add(PMBusCode.UT_FAULT_RESPONSE);
+        }
+        private void InitVINLimits()
+        {
+            VIN_Limits = new ObservableDictionary<PMBusCode, Limit>();
+            VIN_Limits.Add(PMBusCode.VIN_OV_FAULT_LIMIT, new Limit(PMBusCode.VIN_OV_FAULT_LIMIT, PMBusLimitType.Fault));
+            VIN_Limits.Add(PMBusCode.VIN_OV_FAULT_RESPONSE, new Limit(PMBusCode.VIN_OV_FAULT_RESPONSE, PMBusLimitType.Fault));
+            VIN_Limits.Add(PMBusCode.VIN_OV_WARN_LIMIT, new Limit(PMBusCode.VIN_OV_WARN_LIMIT, PMBusLimitType.Warning));
+            VIN_Limits.Add(PMBusCode.VIN_UV_WARN_LIMIT, new Limit(PMBusCode.VIN_UV_WARN_LIMIT, PMBusLimitType.Warning));
+            VIN_Limits.Add(PMBusCode.VIN_UV_FAULT_LIMIT, new Limit(PMBusCode.VIN_UV_FAULT_LIMIT, PMBusLimitType.Fault));
+            VIN_Limits.Add(PMBusCode.VIN_UV_FAULT_RESPONSE, new Limit(PMBusCode.VIN_UV_FAULT_RESPONSE, PMBusLimitType.Fault));
+        }
+        private void InitVOUTLimits()
+        {
+            VOUT_Limits = new ObservableDictionary<PMBusCode, Limit>();
+            VOUT_Limits.Add(PMBusCode.VOUT_OV_FAULT_LIMIT, new Limit(PMBusCode.VOUT_OV_FAULT_LIMIT, PMBusLimitType.Fault));
+            VOUT_Limits.Add(PMBusCode.VOUT_OV_FAULT_RESPONSE, new Limit(PMBusCode.VOUT_OV_FAULT_RESPONSE, PMBusLimitType.Fault));
+            VOUT_Limits.Add(PMBusCode.VOUT_OV_WARN_LIMIT, new Limit(PMBusCode.VOUT_OV_WARN_LIMIT, PMBusLimitType.Warning));
+            VOUT_Limits.Add(PMBusCode.VOUT_UV_WARN_LIMIT, new Limit(PMBusCode.VOUT_UV_WARN_LIMIT, PMBusLimitType.Warning));
+            VOUT_Limits.Add(PMBusCode.VOUT_UV_FAULT_LIMIT, new Limit(PMBusCode.VOUT_UV_FAULT_LIMIT, PMBusLimitType.Fault));
+            VOUT_Limits.Add(PMBusCode.VOUT_UV_FAULT_RESPONS, new Limit(PMBusCode.VOUT_UV_FAULT_RESPONS, PMBusLimitType.Fault));
+        }
+        private void InitIOUTLimits()
+        {
+            IOUT_Limits = new ObservableDictionary<PMBusCode, Limit>();
+            IOUT_Limits.Add(PMBusCode.IOUT_OC_FAULT_LIMIT, new Limit(PMBusCode.IOUT_OC_FAULT_LIMIT, PMBusLimitType.Fault));
+            IOUT_Limits.Add(PMBusCode.IOUT_OC_FAULT_RESPONSE, new Limit(PMBusCode.IOUT_OC_FAULT_RESPONSE, PMBusLimitType.Fault));
+            IOUT_Limits.Add(PMBusCode.IOUT_OC_WARN_LIMIT, new Limit(PMBusCode.IOUT_OC_WARN_LIMIT, PMBusLimitType.Warning)); 
+        }
+        private void InitPOUTLimits()
+        {
+            POUT_Limits = new ObservableDictionary<PMBusCode, Limit>();
+            POUT_Limits.Add(PMBusCode.POUT_OP_FAULT_LIMIT, new Limit(PMBusCode.POUT_OP_FAULT_LIMIT, PMBusLimitType.Fault));
+            POUT_Limits.Add(PMBusCode.POUT_OP_WARN_LIMIT, new Limit(PMBusCode.POUT_OP_WARN_LIMIT, PMBusLimitType.Warning));
+        }
+        private void InitTEMPLimits()
+        {
+            TEMP_Limits = new ObservableDictionary<PMBusCode, Limit>();
+            TEMP_Limits.Add(PMBusCode.OT_FAULT_LIMIT, new Limit(PMBusCode.OT_FAULT_LIMIT, PMBusLimitType.Fault));
+            TEMP_Limits.Add(PMBusCode.OT_FAULT_RESPONSE, new Limit(PMBusCode.OT_FAULT_RESPONSE, PMBusLimitType.Fault));
+            TEMP_Limits.Add(PMBusCode.OT_WARN_LIMIT, new Limit(PMBusCode.OT_WARN_LIMIT, PMBusLimitType.Warning));
+            TEMP_Limits.Add(PMBusCode.UT_WARN_LIMIT, new Limit(PMBusCode.UT_WARN_LIMIT, PMBusLimitType.Warning));
+            TEMP_Limits.Add(PMBusCode.UT_FAULT_LIMIT, new Limit(PMBusCode.UT_FAULT_LIMIT, PMBusLimitType.Fault));
+            TEMP_Limits.Add(PMBusCode.UT_FAULT_RESPONSE, new Limit(PMBusCode.UT_FAULT_RESPONSE, PMBusLimitType.Fault));
+        }
+        private void InitLimits()
+        {
+            InitVINLimits();
+            InitVOUTLimits();
+            InitIOUTLimits();
+            InitPOUTLimits();
+            InitTEMPLimits();
         }
 
         public ParamerusPMBusDevice(PMBusDevice device)
@@ -509,67 +686,51 @@ namespace ParamerusStudio.PMBus
             if (device == null)
                 throw new ArgumentNullException(nameof(device), "Device cannot be null");
             Device = device;
+            InitLimits();
             InitRegs();
             InitReadCommands();
-
-
+            InitOnceExecutedCommands();
+            InitPMBusCommands();
+            UpdateAllCommands();
         }
         #endregion
 
         #region Update methods
-        private void UpdateRegister(ParamerusRegisterStatus register, PMBusCode cmd)
+
+        void UpdateAllCommands()
         {
-            if (register.StatusRegister != BitStatus.BitNotImplemented)
+            if (pmbus_commands != null && pmbus_commands.Count != 0)
             {
-                var reg_val = Device.SMBus_Read_Byte((byte)cmd);
-                if (reg_val.SAA_Status == SAAStatus.Success)
-                    register.RegisterValue = reg_val.Byte;
-                else
-                    register.StatusRegister = BitStatus.BitNotImplemented;
-            }
-        }
-
-
-
-        private void UpdateStatusRegisters()
-        {
-            UpdateRegister(Status_VOUT, PMBusCode.STATUS_VOUT);
-            UpdateRegister(Status_IOUT, PMBusCode.STATUS_IOUT);
-            UpdateRegister(Status_TEMP, PMBusCode.STATUS_TEMP);
-            UpdateRegister(Status_CML, PMBusCode.STATUS_CML);
-            UpdateRegister(Status_INPUT, PMBusCode.STATUS_INPUT);
-            UpdateRegister(Status_Fans_1_2, PMBusCode.STATUS_FANS_1_2);
-            UpdateRegister(Status_Fans_3_4, PMBusCode.STATUS_FANS_3_4);
-            UpdateRegister(Status_Mfr_Specific, PMBusCode.STATUS_MFR_SPECIFIC);
-            UpdateRegister(Status_Other, PMBusCode.STATUS_OTHER);
-        }
-
-
-        private void UpdateReadValues()
-        {
-            if (read_commands != null && read_commands.Count != 0)
-            {
-                foreach (PMBusReadCommand cmd in read_commands)
+                foreach (var cmd in pmbus_commands)
                 {
-                    object res = cmd.ReadCmd();
+                    cmd.Value.ReadCmd();
                 }
             }
         }
-        private CancellationTokenSource stopUpdateTask;
+        void UpdateCommands(List<PMBusCode> cmds)
+        {
+            if (cmds != null && cmds.Count != 0 && pmbus_commands != null && pmbus_commands.Count != 0)
+            {
+                foreach (var cmd in cmds)
+                {
+                    object res = pmbus_commands[cmd].ReadCmd();
+                }
+            }
+        }
+        /// <summary>
+        /// Обновление параметров устройства
+        /// </summary>
         private void Update()
         {
             while (!stopUpdateTask.IsCancellationRequested)
             {
                 ControlLineStatusUpdate();
-                UpdateReadValues();
-                UpdateStatusRegisters();
+                UpdateCommands(ConstantlyUpdatetCommands);
                 Thread.Sleep(TimeSpan.FromTicks(1000));
             }
 
         }
-        /// <summary>
-        /// Обновление параметров устройства
-        /// </summary>
+        
         public void StartListener()
         {
             stopUpdateTask = new CancellationTokenSource();
